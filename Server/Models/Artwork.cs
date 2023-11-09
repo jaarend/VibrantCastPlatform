@@ -14,13 +14,11 @@ namespace Server.Models
         public int Id { get; set; }
         [Required]
 
-        [ForeignKey("ApplicantionUser")]
-        public string CreatorId { get; set; }
+        [ForeignKey("ApplicationUser")]
+        public string CreatorId { get; set; } = null!;
         public virtual ApplicationUser? ApplicationUser {get; set;}
 
-        public List<Collections>? CollectionId { get; set; }
 
-        public virtual Collections? Collections {get; set;}
         [Required]
         public string FullImage { get; set; } = string.Empty;
         [Required]
@@ -40,10 +38,6 @@ namespace Server.Models
         [MaxLength(100)]
         public string PostalCode { get; set; } = string.Empty;
 
-        public List<MediumTags>? MediumTagsId { get; set; }
-
-        public virtual MediumTags? MediumTags { get; set; }
-
         [MaxLength(500)]
         public string Materials { get; set; } = string.Empty;
         [MaxLength(100)]
@@ -53,14 +47,22 @@ namespace Server.Models
 
         public float Price { get; set; }
 
-        public List<Experiences>? ActiveExperiencesId { get; set; }
-
-        public virtual Experiences? Experiences { get; set; }
-
         [Required]
         public DateTime DateCreated { get; set; }
 
         public DateTimeOffset? DateModified { get; set; }
+
+        public virtual ICollection<Experience> Experiences { get; set;}
+        public virtual ICollection<Collection> Collections {get; set;}
+
+        public virtual ICollection<MediumTag> MediumTags {get; set;}
+
+        public Artwork()
+        {
+            Experiences = new HashSet<Experience>();
+            Collections = new HashSet<Collection>();
+            MediumTags = new HashSet<MediumTag>();
+        }
 
     }
 }

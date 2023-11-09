@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Server.Models
 {
-    public class Interactions
+    public class Interaction
     {
         [Key]
         public int Id { get; set; }

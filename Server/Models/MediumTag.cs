@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Server.Models
 {
-    public class ExperienceTypes
+    public class MediumTag
     {
         [Key]
         public int Id { get; set; }
@@ -19,5 +19,8 @@ namespace Server.Models
         public DateTime DateCreated { get; set; }
 
         public DateTimeOffset? DateModified { get; set; }
+
+        public virtual ICollection<Artwork> Artworks {get; set;}
+
     }
 }

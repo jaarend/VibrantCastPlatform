@@ -14,7 +14,7 @@ public class ApplicationUser : IdentityUser
 
     public int AspNetUserRoles { get; set; }
 
-    public virtual UserAccountInfo UserAccountInfo {get; set;}
+    public virtual UserAccountInfo? UserAccountInfo {get; set;}
 
     [Required]
     public DateTime DateCreated { get; set; }

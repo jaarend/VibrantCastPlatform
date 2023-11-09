@@ -6,30 +6,18 @@ using System.Threading.Tasks;
 
 namespace Server.Models
 {
-    public class Inquiries
+    public class InteractionType
     {
         [Key]
         public int Id { get; set; }
 
-        public int FromUserId { get; set; }
-
-        public int ToUserId { get; set; }
-
-        public int ArtworkId { get; set; }
-
-        [MaxLength(500)]
-        public string Title { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
 
         public string Description { get; set; } = string.Empty;
-
-        public int InteractionId { get; set; }
 
         [Required]
         public DateTime DateCreated { get; set; }
 
-        public DateTimeOffset? DateOpened { get; set; }
-
-
-
+        public DateTimeOffset DateModified { get; set; }
     }
 }
