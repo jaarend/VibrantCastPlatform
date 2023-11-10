@@ -11,7 +11,7 @@ namespace Server.Models
     public class UserAccountInfo
     {
         [ForeignKey("ApplicationUser")]
-        public int Id { get; set; }
+        public string Id { get; set; }
 
         public virtual ApplicationUser ApplicationUser {get; set;}
 

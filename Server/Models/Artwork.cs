@@ -16,7 +16,7 @@ namespace Server.Models
 
         [ForeignKey("ApplicationUser")]
         public string CreatorId { get; set; } = null!;
-        public virtual ApplicationUser? ApplicationUser {get; set;}
+        public virtual ApplicationUser? Users {get; set;}
 
 
         [Required]

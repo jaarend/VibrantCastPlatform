@@ -13,12 +13,13 @@ namespace Server.Models
         [Key]
         public int Id { get; set; }
 
-        [ForeignKey("ApplicationUser")]
-        public string? OrganizationAdminsId { get; set; }
+        // [ForeignKey("ApplicationUser")]
+        // public string? OrganizationAdminsId { get; set; }
 
-        [ForeignKey("ApplicationUser")]
-        public string? OrganizationMembersId { get; set; }
-        public virtual ApplicationUser? ApplicationUser { get; set; }
+        // [ForeignKey("ApplicationUser")]
+        // public string? OrganizationMembersId { get; set; }
+        // public virtual ApplicationUser? ApplicationUser { get; set; }
+
 
         [Required]
         [ForeignKey("MembershipType")]
@@ -29,5 +30,11 @@ namespace Server.Models
         public DateTime DateCreated { get; set; }
 
         public DateTimeOffset? DateModified { get; set; }
+        public virtual ICollection<OrganizationUserMapping> OrganizationUserMapping {get; set;}
+
+        public Organization()
+        {
+            OrganizationUserMapping = new HashSet<OrganizationUserMapping>();
+        }
     }
 }

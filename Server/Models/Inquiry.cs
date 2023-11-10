@@ -20,7 +20,7 @@ namespace Server.Models
         [ForeignKey("ApplicationUser")]
         public string ToUserId { get; set; } //person receiving the inquiry
 
-        public virtual ApplicationUser ApplicationUser {get; set;}
+        public virtual ApplicationUser Users {get; set;}
 
         [ForeignKey("Artwork")]
         public int? ArtworkId { get; set; } //can be null if it is not referring to an artwork

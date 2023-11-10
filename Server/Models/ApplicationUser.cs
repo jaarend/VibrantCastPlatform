@@ -12,12 +12,17 @@ public class ApplicationUser : IdentityUser
     public int MembershipTypeId { get; set; }
     public virtual MembershipType? MembershipType {get; set;}
 
-    public int AspNetUserRoles { get; set; }
-
     public virtual UserAccountInfo? UserAccountInfo {get; set;}
 
     [Required]
     public DateTime DateCreated { get; set; }
 
     public DateTimeOffset? DateModified { get; set; }
+
+    public ICollection<OrganizationUserMapping> UsersInOrganization {get; set;}
+
+    public ApplicationUser()
+    {
+        UsersInOrganization = new HashSet<OrganizationUserMapping>();
+    }
 }

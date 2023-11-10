@@ -22,5 +22,10 @@ namespace Server.Models
 
         public virtual ICollection<Artwork> Artworks {get; set;}
 
+        public MediumTag()
+        {
+            Artworks = new HashSet<Artwork>();
+        }
+
     }
 }
