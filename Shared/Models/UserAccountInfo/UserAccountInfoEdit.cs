@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Shared.Models.UserAccountInfo
 {
-    public class UserAccountInfoCreate
+    public class UserAccountInfoEdit
     {
         
         [MaxLength(250)]
@@ -49,7 +49,5 @@ namespace Shared.Models.UserAccountInfo
         public string SnapChat { get; set; } = string.Empty;
         [MaxLength(250)]
         public string WhatsApp { get; set; } = string.Empty;
-
-        public DateTime DateCreated { get; set; }
     }
 }

@@ -1,4 +1,4 @@
-﻿@page "/register/accountinfo"
+﻿@page "/profile/accountinfo"
 @using global::Shared.Models.UserAccountInfo;
 @using Microsoft.AspNetCore.Authorization;
 @attribute [Authorize]
@@ -21,7 +21,7 @@
 
         <div class="form-group">
             <label>Artist Name</label>
-            <InputText class="form-control" @bind-Value="model.ArtistName"/>
+            <InputText class="form-control" @bind-Value="model.ArtistName" />
             <label>First Name</label>
             <InputText class="form-control" @bind-Value="model.FirstName" />
             <label>Last Name</label>
@@ -69,13 +69,13 @@
 
 @code {
 
-    private readonly UserAccountInfoCreate model = new();
+    private readonly UserAccountInfoEdit model = new();
 
     private string errorMessage;
 
     private async void HandleSubmit()
     {
-        var createResponse = await Http.PostAsJsonAsync<UserAccountInfoCreate>("api/profile/accountinfo", model);
+        var createResponse = await Http.PutAsJsonAsync<UserAccountInfoEdit>("api/profile/accountinfo", model);
 
         if(createResponse.IsSuccessStatusCode)
         {
@@ -83,7 +83,7 @@
         }
         else
         {
-            errorMessage = "Could not save account information right now. Please try again.";
+            errorMessage = "Could not update account information right now. Please try again.";
         }
     }
 
