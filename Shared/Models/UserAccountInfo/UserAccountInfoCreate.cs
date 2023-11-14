@@ -8,7 +8,6 @@ namespace Shared.Models.UserAccountInfo
 {
     public class UserAccountInfoCreate
     {
-        public string Id { get; set; }
         
         [MaxLength(250)]
         public string ArtistName { get; set; } = string.Empty;

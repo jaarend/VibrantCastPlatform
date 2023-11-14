@@ -1,0 +1,90 @@
+﻿@page "/profile/accountinfo"
+@using global::Shared.Models.UserAccountInfo;
+@using Microsoft.AspNetCore.Authorization;
+@attribute [Authorize]
+@inject HttpClient Http
+@inject NavigationManager navigation
+
+<PageTitle>Account Information</PageTitle>
+
+<h1>Update Account Information</h1>
+
+@if(errorMessage != null)
+{
+    <h5 class="text-danger">@errorMessage</h5>
+}
+
+<div class="container">
+    <EditForm Model="@model" OnValidSubmit="@HandleSubmit">
+        <DataAnnotationsValidator/>
+        <ValidationSummary/>
+
+        <div class="form-group">
+            <label>Artist Name</label>
+            <InputText class="form-control" @bind-Value="model.ArtistName"/>
+            <label>First Name</label>
+            <InputText class="form-control" @bind-Value="model.FirstName" />
+            <label>Last Name</label>
+            <InputText class="form-control" @bind-Value="model.LastName" />
+            <label>Tell us about yourself. What inspires you?</label>
+            <InputText class="form-control" @bind-Value="model.Description" />
+            <label>Commission Price</label>
+            <InputNumber class="form-control" @bind-Value="model.CommissionPrice" />
+            <label>Address</label>
+            <InputText class="form-control" @bind-Value="model.Address" />
+            <label>City</label>
+            <InputText class="form-control" @bind-Value="model.City" />
+            <label>State</label>
+            <InputText class="form-control" @bind-Value="model.State" />
+            <label>Country</label>
+            <InputText class="form-control" @bind-Value="model.Country" />
+            <label>Postal Code</label>
+            <InputText class="form-control" @bind-Value="model.PostalCode" />
+            <label>Website</label>
+            <InputText class="form-control" @bind-Value="model.Website" />
+            <label>Booking Link</label>
+            <InputText class="form-control" @bind-Value="model.Booking" />
+            <label>Instagram</label>
+            <InputText class="form-control" @bind-Value="model.Instagram" />
+            <label>Facebook</label>
+            <InputText class="form-control" @bind-Value="model.Facebook" />
+            <label>TwitterX</label>
+            <InputText class="form-control" @bind-Value="model.TwitterX" />
+            <label>LinkedIn</label>
+            <InputText class="form-control" @bind-Value="model.LinkedIn" />
+            <label>TikTok</label>
+            <InputText class="form-control" @bind-Value="model.TikTok" />
+            <label>SnapChat</label>
+            <InputText class="form-control" @bind-Value="model.SnapChat" />
+            <label>WhatsApp</label>
+            <InputText class="form-control" @bind-Value="model.WhatsApp" />
+
+        </div>
+        <button type="submit" class="btn btn-primary btn-block mt-5"> Submit </button>
+    </EditForm>
+
+
+</div>
+
+
+@code {
+
+    private readonly UserAccountInfoCreate model = new();
+
+    private string errorMessage;
+
+    private async void HandleSubmit()
+    {
+        var createResponse = await Http.PostAsJsonAsync<UserAccountInfoCreate>("api/profile/accountinfo", model);
+
+        if(createResponse.IsSuccessStatusCode)
+        {
+            navigation.NavigateTo("/profile");
+        }
+        else
+        {
+            errorMessage = "Could not save account information right now. Please try again.";
+        }
+    }
+
+}

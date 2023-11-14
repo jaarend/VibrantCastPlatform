@@ -40,7 +40,7 @@ namespace Server.Controllers
         }
 
         //CREATE
-
+        [HttpPost]
         public async Task<IActionResult> Create(UserAccountInfoCreate model)
         {
             if(model == null) return BadRequest();
