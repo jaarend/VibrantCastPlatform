@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
+using Server.Services.Artwork;
 using Server.Services.UserAccountInfo;
 using VibrantCastPlatform.Server.Data;
 using VibrantCastPlatform.Server.Models;
@@ -9,7 +10,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddScoped<IUserAccountInfoService, UserAccountInfoService>(); 
+builder.Services.AddScoped<IUserAccountInfoService, UserAccountInfoService>();
+builder.Services.AddScoped<IArtworkService, ArtworkService>();
+
 
 
 

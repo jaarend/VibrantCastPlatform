@@ -1,26 +1,17 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
-using VibrantCastPlatform.Server.Models;
 
-namespace Server.Models
+namespace Shared.Models.Artwork
 {
-    public class Artwork
+    public class ArtworkCreate
     {
-        [Key]
-        public int Id { get; set; }
-        [Required]
+        public string? CreatorId { get; set; }
 
-        [ForeignKey("ApplicationUser")]
-        public string CreatorId { get; set; }
-        public virtual ApplicationUser? Users {get; set;}
-
-
-        [Required]
         public string FullImage { get; set; } = string.Empty;
+
         [Required]
         [MaxLength(500)]
         public string Title { get; set; } = string.Empty;
@@ -51,18 +42,5 @@ namespace Server.Models
         public DateTime DateCreated { get; set; }
 
         public DateTimeOffset? DateModified { get; set; }
-
-        public virtual ICollection<Experience> Experiences { get; set;}
-        public virtual ICollection<Collection> Collections {get; set;}
-
-        public virtual ICollection<MediumTag> MediumTags {get; set;}
-
-        public Artwork()
-        {
-            Experiences = new HashSet<Experience>();
-            Collections = new HashSet<Collection>();
-            MediumTags = new HashSet<MediumTag>();
-        }
-
     }
 }
