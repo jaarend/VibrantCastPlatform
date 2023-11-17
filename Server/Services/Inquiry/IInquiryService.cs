@@ -8,6 +8,10 @@ namespace Server.Services.Inquiry
 {
     public interface IInquiryService
     {
+        void SetUserId(string userId);
         Task<bool> CreateInquiryAsync(InquiryCreate model);
+        Task<IEnumerable<InquiryDetail>> GetAllOwnerInquiriesAsync();
+
+        Task<InquiryDetail> GetInquiryByIdAsync(int inquiryId);
     }
 }
