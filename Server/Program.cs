@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using Server.Services.Artwork;
+using Server.Services.Inquiry;
 using Server.Services.UserAccountInfo;
 using VibrantCastPlatform.Server.Data;
 using VibrantCastPlatform.Server.Models;
@@ -12,6 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddScoped<IUserAccountInfoService, UserAccountInfoService>();
 builder.Services.AddScoped<IArtworkService, ArtworkService>();
+builder.Services.AddScoped<IInquiryService, InquiryService>();
 
 
 
