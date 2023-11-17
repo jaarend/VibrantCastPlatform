@@ -103,5 +103,24 @@ namespace Server.Controllers
             return BadRequest();
 
         }
+
+
+        //DELETE
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            if (!SetUserIdInService()) return Unauthorized();
+
+            var artwork = await _artworkService.GetArtworkDetailByIdAsync(id);
+
+            if(artwork == null) return NotFound();
+
+            bool wasSuccessful = await _artworkService.DeleteArtworkAsync(id);
+
+            if(!wasSuccessful) return BadRequest();
+
+            return Ok();
+        }
     }
 }

@@ -80,6 +80,33 @@ namespace Server.Services.Artwork
 
         }
 
+        public async Task<ArtworkDetail> GetArtworkDetailByIdAsync(int artworkId)
+        {
+            var entity = await _dbContext
+                .Artworks
+                .FirstOrDefaultAsync(e => e.Id == artworkId && e.CreatorId == _userId);
+
+            if(entity is null)
+                return null;
+            
+            var detail = new ArtworkDetail
+            {
+                Title = entity.Title,
+                Description = entity.Description,
+                Address = entity.Address,
+                City = entity.City,
+                State = entity.State,
+                Country = entity.Country,
+                PostalCode = entity.PostalCode,
+                Materials = entity.Materials,
+                Width = entity.Width,
+                Height = entity.Height,
+                Price = entity.Price
+            };
+
+            return detail;
+            
+        }
 
         //UPDATE
 
@@ -108,32 +135,17 @@ namespace Server.Services.Artwork
             return await _dbContext.SaveChangesAsync() == 1;
         }
 
-        public async Task<ArtworkDetail> GetArtworkDetailByIdAsync(int artworkId)
+
+        //DELETE
+
+        public async Task<bool> DeleteArtworkAsync(int artworkId)
         {
-            var entity = await _dbContext
-                .Artworks
-                .FirstOrDefaultAsync(e => e.Id == artworkId && e.CreatorId == _userId);
-
-            if(entity is null)
-                return null;
+            var entity = await _dbContext.Artworks.FindAsync(artworkId);
+            if(entity.CreatorId != _userId)
+                return false;
             
-            var detail = new ArtworkDetail
-            {
-                Title = entity.Title,
-                Description = entity.Description,
-                Address = entity.Address,
-                City = entity.City,
-                State = entity.State,
-                Country = entity.Country,
-                PostalCode = entity.PostalCode,
-                Materials = entity.Materials,
-                Width = entity.Width,
-                Height = entity.Height,
-                Price = entity.Price
-            };
-
-            return detail;
-            
+            _dbContext.Artworks.Remove(entity);
+            return await _dbContext.SaveChangesAsync() == 1;
         }
 
         /*
