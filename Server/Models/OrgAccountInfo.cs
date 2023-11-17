@@ -10,15 +10,15 @@ namespace Server.Models
 {
     public class OrgAccountInfo
     {
-        [ForeignKey("Organizations")]
+        [ForeignKey("Organization")]
         public int Id { get; set; }
 
-        public virtual Organizations Organizations {get; set;}
+        public virtual Organization Organization {get; set;}
 
         public string ProfileImage { get; set; } = string.Empty;
         [MaxLength(500)]
         public string OrganizationName { get; set; } = string.Empty;
-        
+
         [MaxLength(2000)]
         public string Description { get; set; } = string.Empty;
 

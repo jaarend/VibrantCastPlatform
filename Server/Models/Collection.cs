@@ -1,19 +1,26 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
+using VibrantCastPlatform.Server.Models;
 
 namespace Server.Models
 {
-    public class Collections
+    public class Collection
     {
         [Key]
         public int Id { get; set; }
         [Required]
-        public int CreatorId { get; set; }
 
+        [ForeignKey("ApplicationUser")]
+        public string CreatorId { get; set; } = null!;
+        public virtual ApplicationUser? Users {get; set;}
+
+        [ForeignKey("Organization")]
         public int OrganizationId { get; set; }
+        public virtual Organization? Organization {get; set;}
 
         [Required]
         [MaxLength(500)]
@@ -25,5 +32,12 @@ namespace Server.Models
         public DateTime DateCreated { get; set; }
 
         public DateTimeOffset? DateModified { get; set; }
+
+        public virtual ICollection<Artwork> Artworks {get; set;}
+
+        public Collection()
+        {
+            Artworks = new HashSet<Artwork>();
+        }
     }
 }

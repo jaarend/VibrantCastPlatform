@@ -1,0 +1,132 @@
+﻿@page "/artwork/edit/{Id:int}"
+@using global::Shared.Models.Artwork;
+@using Newtonsoft.Json;
+@using Microsoft.AspNetCore.Components.Forms;
+@using Microsoft.AspNetCore.Authorization;
+@using System.Text.Json.Serialization;
+@attribute [Authorize]
+@inject HttpClient Http
+@inject NavigationManager navigation
+
+<PageTitle>upload new Artwork</PageTitle>
+
+<h1>Update Account Information</h1>
+
+@if (errorMessage != null)
+{
+    <h5 class="text-danger">@errorMessage</h5>
+}
+
+@if(!isLoading)
+{
+
+<div class="container">
+    <EditForm Model="@model" OnValidSubmit="@HandleSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        @* <div class="form-group">
+            <label>Image</label>
+            <InputFile id="file" class="form-control" OnChange="OnChooseFile" />
+        </div>
+        <div class="row">
+            <img src="@imgUrl" />
+        </div>
+        <div class="form-group">
+            <ValidationMessage For="@(() => model.FullImage)" />
+        </div> *@
+
+        <div class="form-group">
+            <label>Title</label>
+            <InputText class="form-control" @bind-Value="model.Title" />
+        </div>
+        <div class="form-group">
+            <label>Description</label>
+            <InputText class="form-control" @bind-Value="model.Description" />
+        </div>
+        <div class="form-group">
+            <label>Address</label>
+            <InputText class="form-control" @bind-Value="model.Address" />
+        </div>
+        <div class="form-group">
+            <label>City</label>
+            <InputText class="form-control" @bind-Value="model.City" />
+        </div>
+        <div class="form-group">
+            <label>State</label>
+            <InputText class="form-control" @bind-Value="model.State" />
+        </div>
+        <div class="form-group">
+            <label>Country</label>
+            <InputText class="form-control" @bind-Value="model.Country" />
+        </div>
+        <div class="form-group">
+            <label>Postal Code</label>
+            <InputText class="form-control" @bind-Value="model.PostalCode" />
+        </div>
+        <div class="form-group">
+            <label>Materials</label>
+            <InputText class="form-control" @bind-Value="model.Materials" />
+        </div>
+        <div class="form-group">
+            <label>Width</label>
+            <InputText class="form-control" @bind-Value="model.Width" />
+        </div>
+        <div class="form-group">
+            <label>Height</label>
+            <InputText class="form-control" @bind-Value="model.Height" />
+        </div>
+        <div class="form-group">
+            <label>Price</label>
+            <InputNumber class="form-control" @bind-Value="model.Price" />
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block mt-5"> Update Artwork </button>
+    </EditForm>
+
+
+</div>
+}
+else
+{
+    <p>Loading...</p>
+}
+
+
+
+@code {
+
+    [Parameter]
+
+    public int Id {get; set;}
+    private ArtworkUpdate model {get; set;}
+    private bool isLoading = true;
+
+    private string errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        model = await Http.GetFromJsonAsync<ArtworkUpdate>($"/api/artwork/{Id}");
+        isLoading = false;
+        
+    }
+
+    private async void HandleSubmit()
+    {
+        model.Id = Id;
+
+        var response = await Http.PutAsJsonAsync<ArtworkUpdate>($"api/artwork/edit/{Id}", model);
+
+        if(response.IsSuccessStatusCode)
+        {
+            navigation.NavigateTo($"/artwork/{Id}");
+        }
+        else
+        {
+            errorMessage = "Could not update your artwork right now. Please try again.";
+        }
+
+    }
+
+
+}

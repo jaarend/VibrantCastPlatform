@@ -1,0 +1,146 @@
+﻿@page "/artwork/create"
+@using global::Shared.Models.Artwork;
+@using Newtonsoft.Json;
+@using Microsoft.AspNetCore.Components.Forms;
+@using Microsoft.AspNetCore.Authorization;
+@using System.Text.Json.Serialization;
+@attribute [Authorize]
+@inject HttpClient Http
+@inject NavigationManager navigation
+
+<PageTitle>upload new Artwork</PageTitle>
+
+<h1>Update Account Information</h1>
+
+@if (errorMessage != null)
+{
+    <h5 class="text-danger">@errorMessage</h5>
+}
+
+<div class="container">
+    <EditForm Model="@model" OnValidSubmit="@CreateArtworkMetaData">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        @* <div class="form-group">
+            <label>Image</label>
+            <InputFile id="file" class="form-control" OnChange="OnChooseFile" />
+        </div>
+        <div class="row">
+            <img src="@imgUrl" />
+        </div>
+        <div class="form-group">
+            <ValidationMessage For="@(() => model.FullImage)" />
+        </div> *@
+
+        <div class="form-group">
+            <label>Title</label>
+            <InputText class="form-control" @bind-Value="model.Title" />
+        </div>
+        <div class="form-group">
+            <label>Description</label>
+            <InputText class="form-control" @bind-Value="model.Description" />
+        </div>
+        <div class="form-group">
+            <label>Address</label>
+            <InputText class="form-control" @bind-Value="model.Address" />
+        </div>
+        <div class="form-group">
+            <label>City</label>
+            <InputText class="form-control" @bind-Value="model.City" />
+        </div>
+        <div class="form-group">
+            <label>State</label>
+            <InputText class="form-control" @bind-Value="model.State" />
+        </div>
+        <div class="form-group">
+            <label>Country</label>
+            <InputText class="form-control" @bind-Value="model.Country" />
+        </div>
+        <div class="form-group">
+            <label>Postal Code</label>
+            <InputText class="form-control" @bind-Value="model.PostalCode" />
+        </div>
+        <div class="form-group">
+            <label>Materials</label>
+            <InputText class="form-control" @bind-Value="model.Materials" />
+        </div>
+        <div class="form-group">
+            <label>Width</label>
+            <InputText class="form-control" @bind-Value="model.Width" />
+        </div>
+        <div class="form-group">
+            <label>Height</label>
+            <InputText class="form-control" @bind-Value="model.Height" />
+        </div>
+        <div class="form-group">
+            <label>Price</label>
+            <InputNumber class="form-control" @bind-Value="model.Price" />
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block mt-5"> Create Artwork </button>
+    </EditForm>
+
+
+</div>
+
+
+@code {
+
+    private readonly ArtworkCreate model = new();
+
+    private string errorMessage;
+
+    /*
+    private IBrowserFile selectedFile;
+
+    private Stream _fileStream = null;
+    private string _selectedFileName = null;
+
+    string imgUrl = string.Empty;
+    public async Task OnChooseFile(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+
+        if (file == null)
+            return;
+
+        using (var stream = file.OpenReadStream(5000000)) //this is about 50MB max file size
+        {
+            _fileStream = new MemoryStream();
+            await stream.CopyToAsync(_fileStream);
+            _fileStream.Position = 0;
+            _selectedFileName = file.Name;
+        }
+
+        var buffer = new byte[_fileStream.Length];
+        await _fileStream.ReadAsync(buffer, 0, buffer.Length);
+        var base64 = Convert.ToBase64String(buffer);
+
+        imgUrl = $"data:image/png;base64,{base64}";
+    }
+    */
+
+    private async Task CreateArtworkMetaData()
+    {
+
+        var response = await Http.PostAsJsonAsync<ArtworkCreate>("api/artwork/create", model);
+
+        
+        if(response.IsSuccessStatusCode)
+        {
+            navigation.NavigateTo("/profile");
+        }
+        else
+        {
+            errorMessage = "Could not save account information right now. Please try again.";
+        }
+
+    }
+
+    @* private void HandleFileSelected(InputFileChangeEventArgs e)
+{
+selectedFile = e.File;
+} *@
+
+}

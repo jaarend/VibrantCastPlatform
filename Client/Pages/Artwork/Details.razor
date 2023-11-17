@@ -1,0 +1,96 @@
+﻿@page "/artwork/{Id:int}"
+@using global::Shared.Models.Artwork;
+@using Newtonsoft.Json;
+@using Microsoft.AspNetCore.Components.Forms;
+@using Microsoft.AspNetCore.Authorization;
+@using System.Text.Json.Serialization;
+@attribute [Authorize]
+@inject HttpClient Http
+@inject NavigationManager navigation
+
+
+@if (!isLoading)
+{
+    <div class="container">
+    <h1>@model.Title</h1>
+        <div class="card">
+            <div class="text-center justify-content-between w-25">
+                <a href=@($"/artwork/edit/{Id}") class="btn btn-outline-primary">Edit</a>
+                @* add the delete page *@
+                <hr />
+                <a href="/artwork">Back to all artwork</a>
+            </div>
+            <div>
+                <h4 class="card-title">Title</h4>
+                <p class="card-text">@model.Title</p>
+            </div>
+            <div>
+                <h4 class="card-title">Description</h4>
+                <p class="card-text">@model.Description</p>
+            </div>
+            <div>
+                <h4 class="card-title">Address</h4>
+                <p class="card-text">@model.Address</p>
+            </div>
+            <div>
+                <h4 class="card-title">City</h4>
+                <p class="card-text">@model.City</p>
+            </div>
+            <div>
+                <h4 class="card-title">State</h4>
+                <p class="card-text">@model.State</p>
+            </div>
+            <div>
+                <h4 class="card-title">Country</h4>
+                <p class="card-text">@model.Country</p>
+            </div>
+            <div>
+                <h4 class="card-title">PostalCode</h4>
+                <p class="card-text">@model.PostalCode</p>
+            </div>
+            <div>
+                <h4 class="card-title">Materials</h4>
+                <p class="card-text">@model.Materials</p>
+            </div>
+            <div>
+                <h4 class="card-title">Width</h4>
+                <p class="card-text">@model.Width</p>
+            </div>
+            <div>
+                <h4 class="card-title">Height</h4>
+                <p class="card-text">@model.Height</p>
+            </div>
+            <div>
+                <h4 class="card-title">Price</h4>
+                <p class="card-text">@model.Price</p>
+            </div>
+            <div class="d-flex justify-content-center mt-3"></div>
+        </div>
+
+    </div>
+}
+else
+{
+    <p>Loading...</p>
+}
+
+
+
+@code {
+
+    [Parameter]
+
+    public int Id { get; set; }
+    private ArtworkDetail model { get; set; }
+
+    private bool isLoading = true;
+    protected override async Task OnInitializedAsync()
+    {
+        model = await Http.GetFromJsonAsync<ArtworkDetail>($"/api/artwork/{Id}");
+        isLoading = false;
+
+    }
+
+
+
+}

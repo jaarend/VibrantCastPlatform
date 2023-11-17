@@ -1,0 +1,124 @@
+﻿@page "/profile"
+@using global::Shared.Models.UserAccountInfo;
+@using Microsoft.AspNetCore.Authorization;
+@attribute [Authorize]
+@inject HttpClient Http
+@inject NavigationManager navigation
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<PageTitle>Profile</PageTitle>
+
+<h1>Profile</h1>
+
+@if(errorMessage != null)
+{
+    <h5 class="text-danger">@errorMessage</h5>
+}
+
+<a href="/profile/accountinfo">Edit your Profile</a>
+
+<div class="container">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between">
+            <span>Profile</span>
+        </div>
+        @if(UserAccountInfo != null)
+        {
+            <div class="card-body">
+                <h4 class="card-title">@UserAccountInfo.ArtistName</h4>
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">@UserAccountInfo.FirstName</h4>
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">@UserAccountInfo.LastName</h4>
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">@UserAccountInfo.Description</h4>
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">$ @UserAccountInfo.CommissionPrice</h4>
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">@UserAccountInfo.Address</h4>
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">@UserAccountInfo.City</h4>
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">@UserAccountInfo.State</h4>
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">@UserAccountInfo.Country</h4>
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">@UserAccountInfo.PostalCode</h4>
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">@UserAccountInfo.Website</h4>
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">@UserAccountInfo.Booking</h4>
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">@UserAccountInfo.Instagram</h4>
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">@UserAccountInfo.Facebook</h4>
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">@UserAccountInfo.TwitterX</h4>
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">@UserAccountInfo.LinkedIn</h4>
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">@UserAccountInfo.TikTok</h4>
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">@UserAccountInfo.SnapChat</h4>
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">@UserAccountInfo.WhatsApp</h4>
+            </div>
+        }
+    </div>
+
+
+</div>
+
+
+@code {
+
+    private UserAccountInfoDetail UserAccountInfo {get; set;}
+
+    private string errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var userIdClaim = authState.User.FindFirst("sub"); 
+
+        if(userIdClaim != null && !string.IsNullOrEmpty(userIdClaim.Value))
+        {
+            var userId = userIdClaim.Value;
+
+            try
+            {
+                UserAccountInfo = await Http.GetFromJsonAsync<UserAccountInfoDetail>($"/api/profile/{userId}");
+            }
+
+            catch (Exception ex)
+            {
+                errorMessage = $"Error: {ex.Message}";
+            }
+            
+        }
+        else
+        {
+            errorMessage = "UserID not found. You need to be logged in to see your profile.";
+        }
+
+    }
+
+}

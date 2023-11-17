@@ -1,0 +1,72 @@
+﻿@page "/artwork"
+@using global::Shared.Models.Artwork;
+@using Newtonsoft.Json;
+@using Microsoft.AspNetCore.Components.Forms;
+@using Microsoft.AspNetCore.Authorization;
+@using System.Text.Json.Serialization;
+@attribute [Authorize]
+@inject HttpClient Http
+@inject NavigationManager navigation
+
+<PageTitle>Artwork Index</PageTitle>
+
+<h1>This will be a get to show all artwork owned by a user.</h1>
+
+<h3>Artworks</h3>
+
+@if(_artworks == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+
+            <th>Title</th>
+            <th>Description</th>
+            <th>Width</th>
+            <th>Height</th>
+            <th>Price</th>
+
+
+            </tr>
+        </thead>
+        <tbody>
+            @foreach(var artwork in _artworks)
+            {
+                <tr>
+                    <td>
+                        <strong>@artwork.Title</strong>
+                    </td>
+                    <td>
+                        @artwork.Description
+                    </td>
+                    <td>
+                        @artwork.Width
+                    </td>
+                    <td>
+                        @artwork.Height
+                    </td>
+                    <td>
+                        @artwork.Price
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+
+@code{
+
+    private IEnumerable<ArtworkDetail> _artworks;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _artworks = await Http.GetFromJsonAsync<List<ArtworkDetail>>("api/artwork");
+    }
+
+
+}

@@ -1,21 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
-using VibrantCastPlatform.Server.Models;
 
-namespace Server.Models
+namespace Shared.Models.UserAccountInfo
 {
-    public class UserAccountInfo
+    public class UserAccountInfoCreate
     {
-        [ForeignKey("ApplicationUser")]
-        public string Id { get; set; }
-
-        public virtual ApplicationUser ApplicationUser {get; set;}
-
-        public string ProfileImage { get; set; } = string.Empty;
         
         [MaxLength(250)]
         public string ArtistName { get; set; } = string.Empty;
@@ -58,10 +50,6 @@ namespace Server.Models
         [MaxLength(250)]
         public string WhatsApp { get; set; } = string.Empty;
 
-        [Required]
         public DateTime DateCreated { get; set; }
-
-        public DateTimeOffset? DateModified { get; set; }
-
     }
 }
