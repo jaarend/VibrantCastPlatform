@@ -49,9 +49,9 @@ namespace Server.Controllers
         [HttpPost("create")]
         public async Task<IActionResult> UploadArtwork(ArtworkCreate model)
         {
-            if(model == null) return BadRequest();
+            if (model == null) return BadRequest();
 
-            if(!SetUserIdInService()) return Unauthorized();
+            if (!SetUserIdInService()) return Unauthorized();
 
             bool wasSuccessful = await _artworkService.CreateArtworkMetaDataAsync(model);
 
@@ -61,6 +61,47 @@ namespace Server.Controllers
             else return UnprocessableEntity();
         }
 
+        //READ
+
+        [HttpGet]
+        public async Task<List<ArtworkDetail>> Index()
+        {
+            if (!SetUserIdInService()) return new List<ArtworkDetail>();
+
+            var artworks = await _artworkService.GetAllArtworkDetailAsync();
+
+            return artworks.ToList();
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> Artwork(int id)
+        {
+            if (!SetUserIdInService()) return Unauthorized();
+
+            var artwork = await _artworkService.GetArtworkDetailByIdAsync(id);
+            
+            if(artwork == null) return NotFound();
+
+            return Ok(artwork);
+        }
+
         //UPDATE
+
+        [HttpPut("edit/{id}")]
+        public async Task<IActionResult> UpdateArtwork(int id, ArtworkUpdate model)
+        {
+            if (model == null || !ModelState.IsValid) return BadRequest();
+
+            if (!SetUserIdInService()) return Unauthorized();
+
+            if(model.Id != id) return BadRequest();
+
+            bool wasSuccessful = await _artworkService.UpdateArtworkMetaData(model);
+
+            if(wasSuccessful) return Ok();
+
+            return BadRequest();
+
+        }
     }
 }

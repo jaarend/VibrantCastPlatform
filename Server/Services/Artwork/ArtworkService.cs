@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Shared.Models.Artwork;
 using VibrantCastPlatform.Server.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Server.Services.Artwork
 {
@@ -21,6 +22,8 @@ namespace Server.Services.Artwork
             _dbContext = dbContext;
         }
 
+
+        //CREATE
         public void SetUserId(string userId) => _userId = userId;
 
         public async Task<bool> CreateArtworkMetaDataAsync(ArtworkCreate model)
@@ -47,6 +50,90 @@ namespace Server.Services.Artwork
             _dbContext.Artworks.Add(artworkEntity);
             var numberOfChanges = await _dbContext.SaveChangesAsync();
             return numberOfChanges == 1;
+        }
+
+        //READ
+
+        public async Task<IEnumerable<ArtworkDetail>> GetAllArtworkDetailAsync()
+        {
+            var artworkDetails = _dbContext
+                .Artworks
+                .Where(n => n.CreatorId == _userId)
+                .Select(n =>
+                    new ArtworkDetail
+                    {
+                        Title = n.Title,
+                        Description = n.Description,
+                        Address = n.Address,
+                        City = n.City,
+                        State = n.State,
+                        Country =n.Country,
+                        PostalCode = n.PostalCode,
+                        Materials = n.Materials,
+                        Width = n.Width,
+                        Height = n.Height,
+                        Price = n.Price,
+                        DateCreated = n.DateCreated
+                    });
+                
+                return await artworkDetails.ToListAsync();
+
+        }
+
+
+        //UPDATE
+
+        public async Task<bool> UpdateArtworkMetaData(ArtworkUpdate model)
+        {
+            if(model == null)
+                return false;
+
+            var entity = await _dbContext.Artworks.FindAsync(model.Id);
+
+            if(entity?.CreatorId != _userId) return false;
+
+            entity.Title = model.Title;
+            entity.Description = model.Description;
+            entity.Address = model.Address;
+            entity.City = model.City;
+            entity.State = model.State;
+            entity.Country = model.Country;
+            entity.PostalCode = model.PostalCode;
+            entity.Materials = model.Materials;
+            entity.Width = model.Width;
+            entity.Height = model.Height;
+            entity.Price = model.Price;
+            entity.DateModified = DateTime.Now;
+
+            return await _dbContext.SaveChangesAsync() == 1;
+        }
+
+        public async Task<ArtworkDetail> GetArtworkDetailByIdAsync(int artworkId)
+        {
+            var entity = await _dbContext
+                .Artworks
+                .FirstOrDefaultAsync(e => e.Id == artworkId && e.CreatorId == _userId);
+
+            if(entity is null)
+                return null;
+            
+            var detail = new ArtworkDetail
+            {
+                Title = entity.Title,
+                Description = entity.Description,
+                Address = entity.Address,
+                City = entity.City,
+                State = entity.State,
+                Country = entity.Country,
+                PostalCode = entity.PostalCode,
+                Materials = entity.Materials,
+                Width = entity.Width,
+                Height = entity.Height,
+                Price = entity.Price
+            };
+
+            return detail;
+            
         }
 
         /*

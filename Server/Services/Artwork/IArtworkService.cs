@@ -10,5 +10,8 @@ namespace Server.Services.Artwork
     {
         void SetUserId(string userId);
         Task<bool> CreateArtworkMetaDataAsync(ArtworkCreate model);
+        Task<IEnumerable<ArtworkDetail>> GetAllArtworkDetailAsync();
+        Task<ArtworkDetail> GetArtworkDetailByIdAsync(int artworkId);
+        Task<bool> UpdateArtworkMetaData(ArtworkUpdate model);
     }
 }
