@@ -10,7 +10,8 @@ namespace Server.Services.Inquiry
     {
         void SetUserId(string userId);
         Task<bool> CreateInquiryAsync(InquiryCreate model);
-        Task<IEnumerable<InquiryDetail>> GetAllOwnerInquiriesAsync();
+        Task<IEnumerable<InquiryDetail>> GetAllSentInquiriesAsync();
+        Task<IEnumerable<InquiryDetail>> GetAllReceivedInquiriesAsync();
 
         Task<InquiryDetail> GetInquiryByIdAsync(int inquiryId);
     }

@@ -23,7 +23,7 @@ namespace Server.Services.Inquiry
         {
             var entity = new Models.Inquiry
             {
-                FromUserId = model.FromUserId,
+                FromUserId = _userId,
                 ToUserId = model.ToUserId,
                 ArtworkId = model.ArtworkId,
                 Title = model.Title,
@@ -38,11 +38,37 @@ namespace Server.Services.Inquiry
 
         //READ
 
-        public async Task<IEnumerable<InquiryDetail>> GetAllOwnerInquiriesAsync()
+
+        //sent inquiries
+        public async Task<IEnumerable<InquiryDetail>> GetAllSentInquiriesAsync()
         {
+
+            //check if the fromuserId matches the logged in user
             var inquiryList = _dbContext
                 .Inquiries
                 .Where(i => i.FromUserId == _userId)
+                .Select(i =>
+                    new InquiryDetail
+                    {
+                        FromUserId = i.FromUserId,
+                        ToUserId = i.ToUserId,
+                        ArtworkId = i.ArtworkId,
+                        Title = i.Title,
+                        Description = i.Description,
+                        DateCreated = i.DateCreated,
+                        DateOpened = i.DateOpened //need a method that opens inquiry
+                    });
+
+            return await inquiryList.ToListAsync();
+        }
+
+        //receive inquiries
+
+        public async Task<IEnumerable<InquiryDetail>> GetAllReceivedInquiriesAsync()
+        {
+            var inquiryList = _dbContext
+                .Inquiries
+                .Where(i => i.ToUserId == _userId)
                 .Select(i =>
                     new InquiryDetail
                     {

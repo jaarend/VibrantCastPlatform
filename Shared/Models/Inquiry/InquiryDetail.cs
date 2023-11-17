@@ -17,7 +17,6 @@ namespace Shared.Models.Inquiry
         [MaxLength(500)]
         public string Title { get; set; }
         public string Description { get; set; }
-        [Required]
         public DateTime DateCreated { get; set; }
         public DateTimeOffset? DateOpened { get; set; }
     }

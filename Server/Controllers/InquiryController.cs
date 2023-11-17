@@ -44,7 +44,7 @@ namespace Server.Controllers
         [HttpPost("create")]
         public async Task<IActionResult> Create(InquiryCreate model)
         {
-            if (model == null) return BadRequest();
+            // if (model == null) return BadRequest();
 
             if (!SetUserIdInService()) return Unauthorized();
 
@@ -56,12 +56,22 @@ namespace Server.Controllers
 
         //READ
 
+        [HttpGet("sent")]
+        public async Task<List<InquiryDetail>> Sent()
+        {
+            if(!SetUserIdInService()) return new List<InquiryDetail>();
+
+            var inquiries = await _inquiryService.GetAllSentInquiriesAsync();
+
+            return inquiries.ToList();
+
+        }
         [HttpGet]
         public async Task<List<InquiryDetail>> Index()
         {
             if(!SetUserIdInService()) return new List<InquiryDetail>();
 
-            var inquiries = await _inquiryService.GetAllOwnerInquiriesAsync();
+            var inquiries = await _inquiryService.GetAllReceivedInquiriesAsync();
 
             return inquiries.ToList();
 

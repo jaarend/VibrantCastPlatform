@@ -7,7 +7,6 @@ namespace Shared.Models.Inquiry
 {
     public class InquiryCreate
     {
-        public string FromUserId { get; set; }
         public string ToUserId { get; set; }
         public int? ArtworkId { get; set; }
         public string Title { get; set; }
