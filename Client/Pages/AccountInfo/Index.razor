@@ -10,7 +10,7 @@
 
 <h1>Profile</h1>
 
-@if(errorMessage != null)
+@if (errorMessage != null)
 {
     <h5 class="text-danger">@errorMessage</h5>
 }
@@ -22,8 +22,13 @@
         <div class="card-header d-flex justify-content-between">
             <span>Profile</span>
         </div>
-        @if(UserAccountInfo != null)
+        @if (UserAccountInfo != null)
         {
+            var imgString = Convert.ToBase64String(UserAccountInfo.ProfileImage);
+            
+            <div class="card" style="width: 18rem;">
+                <img src="data:image/png;base64,@imgString" alt="Artwork Image" srcset="">
+            </div>
             <div class="card-body">
                 <h4 class="card-title">@UserAccountInfo.ArtistName</h4>
             </div>
@@ -90,16 +95,16 @@
 
 @code {
 
-    private UserAccountInfoDetail UserAccountInfo {get; set;}
+    private UserAccountInfoDetail UserAccountInfo { get; set; }
 
     private string errorMessage;
 
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var userIdClaim = authState.User.FindFirst("sub"); 
+        var userIdClaim = authState.User.FindFirst("sub");
 
-        if(userIdClaim != null && !string.IsNullOrEmpty(userIdClaim.Value))
+        if (userIdClaim != null && !string.IsNullOrEmpty(userIdClaim.Value))
         {
             var userId = userIdClaim.Value;
 
@@ -112,7 +117,7 @@
             {
                 errorMessage = $"Error: {ex.Message}";
             }
-            
+
         }
         else
         {

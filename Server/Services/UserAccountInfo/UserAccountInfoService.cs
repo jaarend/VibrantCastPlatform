@@ -28,6 +28,7 @@ namespace Server.Services.UserAccountInfo
             var userAccountEntity = new Models.UserAccountInfo
             {
                 Id = _userId,
+                ProfileImage = model.ProfileImage,
                 ArtistName = model.ArtistName,
                 FirstName = model.FirstName,
                 LastName = model.LastName,
@@ -66,6 +67,7 @@ namespace Server.Services.UserAccountInfo
 
             var detail = new UserAccountInfoDetail
             {
+                ProfileImage = userAccountInfoEntity.ProfileImage,
                 ArtistName = userAccountInfoEntity.ArtistName,
                 FirstName = userAccountInfoEntity.FirstName,
                 LastName = userAccountInfoEntity.LastName,
@@ -99,6 +101,7 @@ namespace Server.Services.UserAccountInfo
                 .UserAccountInfo
                 .FirstOrDefaultAsync(n => n.Id == _userId);
 
+            entity.ProfileImage = model.ProfileImage;
             entity.ArtistName = model.ArtistName;
             entity.FirstName = model.FirstName;
             entity.LastName = model.LastName;

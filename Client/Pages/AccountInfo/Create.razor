@@ -1,27 +1,33 @@
 ﻿@page "/register/accountinfo"
 @using global::Shared.Models.UserAccountInfo;
 @using Microsoft.AspNetCore.Authorization;
+@using Microsoft.AspNetCore.Components.Forms;
 @attribute [Authorize]
 @inject HttpClient Http
 @inject NavigationManager navigation
 
 <PageTitle>Account Information</PageTitle>
 
-<h1>Update Account Information</h1>
+<h1>Create Account Information</h1>
 
-@if(errorMessage != null)
+@if (errorMessage != null)
 {
     <h5 class="text-danger">@errorMessage</h5>
 }
 
 <div class="container">
     <EditForm Model="@model" OnValidSubmit="@HandleSubmit">
-        <DataAnnotationsValidator/>
-        <ValidationSummary/>
+        <DataAnnotationsValidator />
+        <ValidationSummary />
 
         <div class="form-group">
+            <label>Image</label>
+            <InputFile id="file" class="form-control" OnChange="OnChooseFile" />
+            <div class="row">
+                <img src="@imgUrl" />
+            </div>
             <label>Artist Name</label>
-            <InputText class="form-control" @bind-Value="model.ArtistName"/>
+            <InputText class="form-control" @bind-Value="model.ArtistName" />
             <label>First Name</label>
             <InputText class="form-control" @bind-Value="model.FirstName" />
             <label>Last Name</label>
@@ -72,12 +78,42 @@
     private readonly UserAccountInfoCreate model = new();
 
     private string errorMessage;
+    private IBrowserFile selectedFile;
+
+    private Stream _fileStream = null;
+    private string _selectedFileName = null;
+
+    private byte[] buffer;
+
+    string imgUrl = string.Empty;
+    public async Task OnChooseFile(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+
+        if (file == null)
+            return;
+
+        using (var stream = file.OpenReadStream(5000000)) //this is about 50MB max file size
+        {
+            _fileStream = new MemoryStream();
+            await stream.CopyToAsync(_fileStream);
+            _fileStream.Position = 0;
+            _selectedFileName = file.Name;
+        }
+
+        var buffer = new byte[_fileStream.Length];
+        await _fileStream.ReadAsync(buffer, 0, buffer.Length);
+        var base64 = Convert.ToBase64String(buffer);
+
+        imgUrl = $"data:image/png;base64,{base64}";
+        model.ProfileImage = buffer;
+    }
 
     private async void HandleSubmit()
     {
         var createResponse = await Http.PostAsJsonAsync<UserAccountInfoCreate>("api/profile/accountinfo", model);
 
-        if(createResponse.IsSuccessStatusCode)
+        if (createResponse.IsSuccessStatusCode)
         {
             navigation.NavigateTo("/profile");
         }
