@@ -18,20 +18,17 @@
 }
 
 <div class="container">
-    <EditForm Model="@model" OnValidSubmit="@CreateArtworkMetaData">
+    <EditForm Model="@model" OnValidSubmit="@CreateArtwork">
         <DataAnnotationsValidator />
         <ValidationSummary />
 
-        @* <div class="form-group">
+        <div class="form-group">
             <label>Image</label>
             <InputFile id="file" class="form-control" OnChange="OnChooseFile" />
         </div>
         <div class="row">
             <img src="@imgUrl" />
         </div>
-        <div class="form-group">
-            <ValidationMessage For="@(() => model.FullImage)" />
-        </div> *@
 
         <div class="form-group">
             <label>Title</label>
@@ -91,11 +88,12 @@
 
     private string errorMessage;
 
-    /*
     private IBrowserFile selectedFile;
 
     private Stream _fileStream = null;
     private string _selectedFileName = null;
+
+    private byte[] buffer;
 
     string imgUrl = string.Empty;
     public async Task OnChooseFile(InputFileChangeEventArgs e)
@@ -118,16 +116,16 @@
         var base64 = Convert.ToBase64String(buffer);
 
         imgUrl = $"data:image/png;base64,{base64}";
+        model.FullImage = buffer;
     }
-    */
 
-    private async Task CreateArtworkMetaData()
+
+    private async Task CreateArtwork()
     {
 
         var response = await Http.PostAsJsonAsync<ArtworkCreate>("api/artwork/create", model);
 
-        
-        if(response.IsSuccessStatusCode)
+        if (response.IsSuccessStatusCode)
         {
             navigation.NavigateTo("/profile");
         }
@@ -138,9 +136,5 @@
 
     }
 
-    @* private void HandleFileSelected(InputFileChangeEventArgs e)
-{
-selectedFile = e.File;
-} *@
 
 }

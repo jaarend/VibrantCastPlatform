@@ -12,13 +12,16 @@
 @if (!isLoading)
 {
     <div class="container">
-    <h1>@model.Title</h1>
+        <h1>@model.Title</h1>
         <div class="card">
             <div class="text-center justify-content-between w-25">
                 <a href=@($"/artwork/edit/{Id}") class="btn btn-outline-primary">Edit</a>
                 @* add the delete page *@
                 <hr />
                 <a href="/artwork">Back to all artwork</a>
+            </div>
+            <div>
+                <img src="data:image/png;base64,@FullImageBase64" alt="Artwork Image" srcset="">
             </div>
             <div>
                 <h4 class="card-title">Title</h4>
@@ -82,6 +85,21 @@ else
 
     public int Id { get; set; }
     private ArtworkDetail model { get; set; }
+
+    private string FullImageBase64
+    {
+        get
+        {
+            if (model.FullImage != null)
+            {
+                return Convert.ToBase64String(model.FullImage);
+            }
+            else
+            {
+                return string.Empty;
+            }
+        }
+    }
 
     private bool isLoading = true;
     protected override async Task OnInitializedAsync()

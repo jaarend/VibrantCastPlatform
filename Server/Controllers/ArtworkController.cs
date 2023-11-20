@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Server.Models;
 using Server.Services.Artwork;
 using Shared.Models.Artwork;
+using Microsoft.AspNetCore.Components.Forms;
 
 namespace Server.Controllers
 {
@@ -53,11 +54,11 @@ namespace Server.Controllers
 
             if (!SetUserIdInService()) return Unauthorized();
 
-            bool wasSuccessful = await _artworkService.CreateArtworkMetaDataAsync(model);
+            bool wasSuccessful = await _artworkService.CreateArtworkAsync(model);
 
             //save the artwork to the database
 
-            if (wasSuccessful) return Ok(new { Message = "Artwork metadata created successfully" });
+            if (wasSuccessful) return Ok(new { Message = "Artwork uploaded successfully" });
             else return UnprocessableEntity();
         }
 

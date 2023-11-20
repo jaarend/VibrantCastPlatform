@@ -20,7 +20,7 @@ namespace Server.Models
 
 
         [Required]
-        public string FullImage { get; set; } = string.Empty;
+        public byte[] FullImage { get; set; }
         [Required]
         [MaxLength(500)]
         public string Title { get; set; } = string.Empty;

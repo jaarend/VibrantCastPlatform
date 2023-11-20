@@ -10,7 +10,7 @@ namespace Shared.Models.Artwork
     {
         public string? CreatorId { get; set; }
 
-        public string FullImage { get; set; } = string.Empty;
+        public byte[] FullImage { get; set; }
 
         [Required]
         [MaxLength(500)]
