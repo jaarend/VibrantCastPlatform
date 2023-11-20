@@ -70,6 +70,7 @@ namespace Server.Services.Artwork
                 .Select(n =>
                     new ArtworkDetail
                     {
+                        Id = n.Id,
                         Title = n.Title,
                         FullImage = n.FullImage,
                         Description = n.Description,
@@ -100,6 +101,7 @@ namespace Server.Services.Artwork
 
             var detail = new ArtworkDetail
             {
+                Id = entity.Id,
                 Title = entity.Title,
                 FullImage = entity.FullImage,
                 Description = entity.Description,

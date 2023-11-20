@@ -14,7 +14,7 @@
 
 <h3>Artworks</h3>
 
-@if(_artworks == null)
+@if (_artworks == null)
 {
     <p><em>Loading...</em></p>
 }
@@ -24,21 +24,36 @@ else
         <thead>
             <tr>
 
-            <th>Title</th>
-            <th>Description</th>
-            <th>Width</th>
-            <th>Height</th>
-            <th>Price</th>
+                <th>Image</th>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Width</th>
+                <th>Height</th>
+                <th>Price</th>
 
 
             </tr>
         </thead>
         <tbody>
-            @foreach(var artwork in _artworks)
+            @foreach (var artwork in _artworks)
             {
                 <tr>
                     <td>
+                        @{
+                            var imgString = Convert.ToBase64String(artwork.FullImage);
+                        }
+                        <div class="card" style="width: 18rem;">
+                            <img src="data:image/png;base64,@imgString" alt="Artwork Image" srcset="">
+                        </div>
+                    </td>
+                    <td>
                         <strong>@artwork.Title</strong>
+                        <div class="text-center justify-content-between w-25">
+                            <a href=@($"/artwork/edit/{artwork.Id}") class="btn btn-outline-primary">Edit</a>
+                            @* add the delete page *@
+                            <hr />
+                            <a href="/artwork">Back to all artwork</a>
+                        </div>
                     </td>
                     <td>
                         @artwork.Description
@@ -59,7 +74,7 @@ else
 }
 
 
-@code{
+@code {
 
     private IEnumerable<ArtworkDetail> _artworks;
 
