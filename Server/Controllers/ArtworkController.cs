@@ -97,7 +97,7 @@ namespace Server.Controllers
 
             if(model.Id != id) return BadRequest();
 
-            bool wasSuccessful = await _artworkService.UpdateArtworkMetaData(model);
+            bool wasSuccessful = await _artworkService.UpdateArtwork(model);
 
             if(wasSuccessful) return Ok();
 

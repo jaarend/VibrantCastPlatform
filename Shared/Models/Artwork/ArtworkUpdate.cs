@@ -9,6 +9,7 @@ namespace Shared.Models.Artwork
     {
         public int Id { get; set; }
         public string? Title { get; set; }
+        public byte[] FullImage { get; set; }
 
         public string? Description { get; set; }
 

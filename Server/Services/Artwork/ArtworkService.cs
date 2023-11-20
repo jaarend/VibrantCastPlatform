@@ -120,7 +120,7 @@ namespace Server.Services.Artwork
 
         //UPDATE
 
-        public async Task<bool> UpdateArtworkMetaData(ArtworkUpdate model)
+        public async Task<bool> UpdateArtwork(ArtworkUpdate model)
         {
             if (model == null)
                 return false;
@@ -130,6 +130,7 @@ namespace Server.Services.Artwork
             if (entity?.CreatorId != _userId) return false;
 
             entity.Title = model.Title;
+            entity.FullImage = model.FullImage;
             entity.Description = model.Description;
             entity.Address = model.Address;
             entity.City = model.City;
