@@ -15,7 +15,7 @@ namespace Server.Models
 
         public virtual ApplicationUser ApplicationUser {get; set;}
 
-        public string ProfileImage { get; set; } = string.Empty;
+        public byte[] ProfileImage { get; set; }
         
         [MaxLength(250)]
         public string ArtistName { get; set; } = string.Empty;
