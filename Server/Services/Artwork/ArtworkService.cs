@@ -89,6 +89,32 @@ namespace Server.Services.Artwork
             return await artworkDetails.ToListAsync();
 
         }
+        public async Task<IEnumerable<ArtworkDetail>> GetAllPublicArtworkDetailAsync() //could change this to return new art first...
+        {
+            var artworkDetails = _dbContext
+                .Artworks
+                .Select(n =>
+                    new ArtworkDetail
+                    {
+                        Id = n.Id,
+                        Title = n.Title,
+                        FullImage = n.FullImage,
+                        Description = n.Description,
+                        Address = n.Address,
+                        City = n.City,
+                        State = n.State,
+                        Country = n.Country,
+                        PostalCode = n.PostalCode,
+                        Materials = n.Materials,
+                        Width = n.Width,
+                        Height = n.Height,
+                        Price = n.Price,
+                        DateCreated = n.DateCreated
+                    });
+
+            return await artworkDetails.ToListAsync();
+
+        }
 
         public async Task<ArtworkDetail> GetArtworkDetailByIdAsync(int artworkId)
         {

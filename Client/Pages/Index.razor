@@ -1,68 +1,79 @@
 ﻿@page "/"
 @using global::Shared.Models.Artwork;
 @using global::Shared.Models.UserAccountInfo;
-@inject HttpClient Http
+@inject HttpClient HttpPublic
 
 <div class="container">
-   <!-- Hero Section -->
-   <div class="jumbotron text-center">
-       <h1 class="display-4">Welcome to Our Art Gallery</h1>
-       <p class="lead">Explore and discover the latest artworks.</p>
-       <hr class="my-4">
-       <a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a>
-   </div>
+    <!-- Hero Section -->
+    <div class="jumbotron text-center">
+        <h1 class="display-4">Welcome to Our Art Gallery</h1>
+        <p class="lead">Explore and discover the latest artworks.</p>
+        <hr class="my-4">
+        <a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a>
+    </div>
 
-   <!-- Newly Uploaded Art Section -->
-   <div class="row">
-    @if (_newArtworks == null)
-    {
-    <p><em>Loading...</em></p>
-    }
-    else
-    {
-       <div class="col">
-           <h2>Newly Uploaded Art</h2>
-           @foreach (var artwork in _newArtworks)
-           {
-               <div class="card">
-                  <img src="data:image/png;base64,@Convert.ToBase64String(artwork.FullImage)" class="card-img-top" alt="Artwork Image">
-                  <div class="card-body">
-                      <h5 class="card-title">@artwork.Title</h5>
-                      <p class="card-text">@artwork.Description</p>
-                      <a href="#" class="btn btn-primary">Go somewhere</a>
-                  </div>
-               </div>
-           }
-       </div>
-    }
-    
-   </div>
+    <!-- Newly Uploaded Art Section -->
+    <div class="col">
+        @if (_newArtworks == null)
+        {
+            <p><em>Loading...</em></p>
+        }
+        else
+        {
+            <div class="row m-3">
+                <h2>Newly Uploaded Art</h2>
+                @foreach (var artwork in _newArtworks)
+                {
+                    <div class="card col-md-8 mx-auto m-3" style="width: 18rem;">
+                        <img src="data:image/png;base64,@Convert.ToBase64String(artwork.FullImage)" class="card-img-top m-2"
+                            alt="Artwork Image">
+                        <div class="card-body col-md-8 mx-auto text-center">
+                            <h5 class="card-title">@artwork.Title</h5>
+                            <p class="card-text">@artwork.Description</p>
+                            <a href="#" class="btn btn-primary">Go somewhere</a>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
 
-   <!-- Artists Section -->
-   <div class="row">
-       <div class="col">
-           <h2>Our Artists</h2>
-           <!-- Loop through your artists here -->
-           @* @foreach (var artist in _artists)
-           {
-               <div class="card">
-                  <div class="card-body">
-                      <h5 class="card-title">@artist.FirstName</h5>
-                      <a href="#" class="btn btn-primary">View Profile</a>
-                  </div>
-               </div>
-           } *@
-       </div>
-   </div>
+    </div>
+
+    <!-- Artists Section -->
+    <div class="col">
+        @if (_artists == null)
+        {
+            <p><em>Loading...</em></p>
+        }
+        else
+        {
+            <div class="row m-3">
+                <h2>Our Artists</h2>
+                <!-- Loop through your artists here -->
+                @foreach (var artist in _artists)
+                {
+                    var profileImg = Convert.ToBase64String(artist.ProfileImage);
+                    <div class="card col-md-8 mx-auto m-3" style="width: 18rem;">
+                        <img src="data:image/png;base64,@profileImg" alt="Artwork Image" srcset="" class="rounded-circle m-3">
+                        <div class="card-body col-md-8 mx-auto text-center">
+                            <h5 class="card-title">@artist.FirstName</h5>
+                            <a href="#" class="btn btn-primary">View Profile</a>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
 </div>
 
-@code {
-   private IEnumerable<ArtworkDetail> _newArtworks;
-   @* private IEnumerable<UserAccountInfoDetail> _artists; *@
 
-   protected override async Task OnInitializedAsync()
-   {
-       _newArtworks = await Http.GetFromJsonAsync<List<ArtworkDetail>>("api/artwork/");
-       @* _artists = await Http.GetFromJsonAsync<List<UserAccountInfoDetail>>("api/profile"); *@
-   }
+@code {
+    private IEnumerable<ArtworkDetail> _newArtworks;
+    private IEnumerable<UserAccountInfoDetail> _artists;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _newArtworks = await HttpPublic.GetFromJsonAsync<List<ArtworkDetail>>("api/artwork/public");
+        _artists = await HttpPublic.GetFromJsonAsync<List<UserAccountInfoDetail>>("api/profile/accountinfo/public-users");
+    }
 }

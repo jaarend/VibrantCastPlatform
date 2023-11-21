@@ -91,6 +91,39 @@ namespace Server.Services.UserAccountInfo
             return detail;
         }
 
+        public async Task<IEnumerable<UserAccountInfoDetail>> GetAllPublicUsersAsync()
+        {
+            var publicUsers = _dbContext
+                .UserAccountInfo
+                .Select(n =>
+
+                new UserAccountInfoDetail
+                {
+                    ProfileImage = n.ProfileImage,
+                    ArtistName = n.ArtistName,
+                    FirstName = n.FirstName,
+                    LastName = n.LastName,
+                    Description = n.Description,
+                    CommissionPrice = n.CommissionPrice,
+                    Address = n.Address,
+                    City = n.City,
+                    State = n.State,
+                    Country = n.Country,
+                    PostalCode = n.PostalCode,
+                    Website = n.Website,
+                    Booking = n.Booking,
+                    Instagram = n.Instagram,
+                    Facebook = n.Facebook,
+                    TwitterX = n.TwitterX,
+                    LinkedIn = n.LinkedIn,
+                    TikTok = n.TikTok,
+                    SnapChat = n.SnapChat,
+                    WhatsApp = n.WhatsApp
+                });
+
+                return await publicUsers.ToListAsync();
+        }
+
 
         public async Task<bool> EditUserAccountInfoAsync(UserAccountInfoEdit model)
         {
@@ -124,6 +157,6 @@ namespace Server.Services.UserAccountInfo
             entity.DateModified = DateTimeOffset.Now;
 
             return await _dbContext.SaveChangesAsync() == 1;
-        }    
+        }
     }
 }

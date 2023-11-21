@@ -10,9 +10,11 @@ using Server.Models;
 using Server.Services.Artwork;
 using Shared.Models.Artwork;
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Server.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/artwork")]
 
@@ -70,6 +72,14 @@ namespace Server.Controllers
             if (!SetUserIdInService()) return new List<ArtworkDetail>();
 
             var artworks = await _artworkService.GetAllArtworkDetailAsync();
+
+            return artworks.ToList();
+        }
+        [AllowAnonymous]
+        [HttpGet("public")]
+        public async Task<List<ArtworkDetail>> PublicArtwork()
+        {
+            var artworks = await _artworkService.GetAllPublicArtworkDetailAsync();
 
             return artworks.ToList();
         }

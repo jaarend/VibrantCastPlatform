@@ -4,12 +4,14 @@ using System.Drawing;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Server.Services.UserAccountInfo;
 using Shared.Models.UserAccountInfo;
 
 namespace Server.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/profile/accountinfo")]
     public class UserAccountInfoController : ControllerBase
@@ -56,7 +58,7 @@ namespace Server.Controllers
 
 
         //GET
-        [HttpGet("/api/profile/{userId}")]
+        [HttpGet("{userId}")]
         public async Task<IActionResult> Index(string userId)
         {
             if (!SetUserIdInService()) return Unauthorized();
@@ -66,6 +68,15 @@ namespace Server.Controllers
             if(userAccountInfo == null) return NotFound();
 
             return Ok(userAccountInfo);
+        }
+
+        [AllowAnonymous]
+        [HttpGet("public-users")]
+        public async Task<List<UserAccountInfoDetail>> Index()
+        {
+            var publicUsers = await _userAccountInfoService.GetAllPublicUsersAsync();
+
+            return publicUsers.ToList();
         }
 
 

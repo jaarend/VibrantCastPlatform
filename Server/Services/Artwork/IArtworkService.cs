@@ -13,6 +13,7 @@ namespace Server.Services.Artwork
         Task<bool> CreateArtworkAsync(ArtworkCreate model);
         Task<IEnumerable<ArtworkDetail>> GetAllArtworkDetailAsync();
         Task<ArtworkDetail> GetArtworkDetailByIdAsync(int artworkId);
+        Task<IEnumerable<ArtworkDetail>> GetAllPublicArtworkDetailAsync();
         Task<bool> UpdateArtwork(ArtworkUpdate model);
 
         Task<bool> DeleteArtworkAsync(int artworkId);
