@@ -27,7 +27,7 @@
             var imgString = Convert.ToBase64String(UserAccountInfo.ProfileImage);
             
             <div class="card" style="width: 18rem;">
-                <img src="data:image/png;base64,@imgString" alt="Artwork Image" srcset="">
+                <img src="data:image/png;base64,@imgString" alt="Profile Image" srcset="">
             </div>
             <div class="card-body">
                 <h4 class="card-title">@UserAccountInfo.ArtistName</h4>
@@ -110,11 +110,12 @@
 
             try
             {
-                UserAccountInfo = await Http.GetFromJsonAsync<UserAccountInfoDetail>($"/api/profile/{userId}");
+                UserAccountInfo = await Http.GetFromJsonAsync<UserAccountInfoDetail>($"/api/profile/accountinfo/{userId}");
             }
 
             catch (Exception ex)
             {
+                navigation.NavigateTo("/register/accountinfo");
                 errorMessage = $"Error: {ex.Message}";
             }
 

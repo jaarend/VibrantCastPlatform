@@ -14,7 +14,6 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Server.Controllers
 {
-    [Authorize]
     [ApiController]
     [Route("api/artwork")]
 
@@ -75,7 +74,7 @@ namespace Server.Controllers
 
             return artworks.ToList();
         }
-        [AllowAnonymous]
+        
         [HttpGet("public")]
         public async Task<List<ArtworkDetail>> PublicArtwork()
         {

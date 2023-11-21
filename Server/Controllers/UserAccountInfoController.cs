@@ -11,7 +11,6 @@ using Shared.Models.UserAccountInfo;
 
 namespace Server.Controllers
 {
-    [Authorize]
     [ApiController]
     [Route("api/profile/accountinfo")]
     public class UserAccountInfoController : ControllerBase
@@ -70,7 +69,16 @@ namespace Server.Controllers
             return Ok(userAccountInfo);
         }
 
-        [AllowAnonymous]
+        [HttpGet("public-user/{userId}")]
+        public async Task<IActionResult> ArtworkDetail(string userId)
+        {
+            var userAccountInfo = await _userAccountInfoService.GetUserAccountInfoByIdAsync(userId);
+
+            if(userAccountInfo == null) return NotFound();
+
+            return Ok(userAccountInfo);
+        }
+
         [HttpGet("public-users")]
         public async Task<List<UserAccountInfoDetail>> Index()
         {
