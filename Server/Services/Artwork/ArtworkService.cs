@@ -128,6 +128,7 @@ namespace Server.Services.Artwork
             var detail = new ArtworkDetail
             {
                 Id = entity.Id,
+                CreatorId = entity.CreatorId,
                 Title = entity.Title,
                 FullImage = entity.FullImage,
                 Description = entity.Description,

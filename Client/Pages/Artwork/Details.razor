@@ -19,10 +19,10 @@
         <h1 class="mt-2">@model.Title<span class="ms-3"><a href=@($"/artwork/edit/{Id}")
                     class="btn btn-outline-primary">Edit</a></span></h1>
         <div class="container justify-content-center p-0">
-            <div>
+            <div class="d-flex justify-content-center align-items-center" style="height: 100%;">
                 <img src="data:image/png;base64,@FullImageBase64" alt="Artwork Image" srcset="" class="img-fluid">
             </div>
-            <div class="container p-0 mt-3 mb-5">
+            <div class="container p-0 mt-3 mb-5" style="width: 90%">
                 <p class="card-text">@model.Description</p>
             </div>
         </div>
@@ -73,47 +73,33 @@
         @* this will be information on the artist *@
         @if (userDetail != null)
         {
-            var imgString = Convert.ToBase64String(userDetail.ProfileImage);
+            @* could replace null with a default image *@
+            var imgString = userDetail.ProfileImage != null ? Convert.ToBase64String(userDetail.ProfileImage) : null; 
 
-            <div class="container justify-content-center p-3" style="width: 15rem; background-color: #ddd8d8;">
+            @if (errorMessage != null)
+            {
+                <h5 class="text-danger">@errorMessage</h5>
+            }
+
+            <div class="container justify-content-center p-3" style="width: 15rem; background-color: rgb(219, 185, 217);">
                 <div class="col d-flex gap-2">
                     <div class="row p-2">
                         <img src="data:image/png;base64,@imgString" alt="Profile Image" srcset="">
                     </div>
-                    <div class="row p-2 ms-auto text-end">
-                        <p class="card-text">$@model.Price</p>
-                    </div>
                 </div>
-                @* <div class="col d-flex gap-2">
-        <div class="row">
-        <p class="card-title">Address</p>
-        </div>
-        <div class="row ms-auto text-end">
-        <p class="card-text">@model.Address, @model.City @model.State @model.Country @model.PostalCode</p>
-        </div>
-        </div> consider putting address somewhere else on this page or leave it off*@
                 <div class="col d-flex gap-2">
-                    <div class="row p-2 ">
-                        <p class="card-title">Materials</p>
-                    </div>
                     <div class="row p-2 ms-auto text-end">
-                        <p class="card-text">@model.Materials</p>
+                        <p class="card-text">@userDetail.FirstName @userDetail.LastName</p>
                     </div>
                 </div>
                 <div class="col d-flex gap-2">
-                    <div class="row p-2">
-                        <p class="card-title">Width</p>
-                    </div>
                     <div class="row p-2 ms-auto text-end">
-                        <p class="card-text">@model.Width</p>
+                        <p class="card-text">@userDetail.ArtistName</p>
                     </div>
                 </div>
                 <div class="col d-flex gap-2">
-                    <div class="row p-2">
-                        <p class="card-title">Height</p>
-                    </div>
                     <div class="row p-2 ms-auto text-end">
-                        <p class="card-text">@model.Height</p>
+                        <p class="card-text">@userDetail.Description</p>
                     </div>
                 </div>
             </div>
@@ -132,9 +118,10 @@ else
     [Parameter]
 
     public int Id { get; set; }
-    private ArtworkDetail model { get; set; }
+    private ArtworkDetail model { get; set; } = new ArtworkDetail();
+    private UserAccountInfoDetail userDetail { get; set; } = new UserAccountInfoDetail();
 
-    private UserAccountInfoDetail userDetail { get; set; }
+    private string? errorMessage;
 
     private string FullImageBase64
     {
@@ -154,16 +141,40 @@ else
     private bool isLoading = true;
     protected override async Task OnInitializedAsync()
     {
-
-        //TODO: error: Unhandled exception rendering component: Object reference not set to an instance of an object.
-        var userId = model.CreatorId;
-
-        model = await Http.GetFromJsonAsync<ArtworkDetail>($"/api/artwork/{Id}");
-        userDetail = await Http.GetFromJsonAsync<UserAccountInfoDetail>($"/api/profile/accountinfo/{userId}");
         isLoading = false;
 
+        try
+        {
+            model = await Http.GetFromJsonAsync<ArtworkDetail>($"/api/artwork/{Id}");
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error: {ex.Message}";
+        }
+
+        if (model != null)
+        {
+
+            //TODO: error: Unhandled exception rendering component: Object reference not set to an instance of an object.
+            var userId = model.CreatorId;
+
+            try
+            {
+                userDetail = await Http.GetFromJsonAsync<UserAccountInfoDetail>($"/api/profile/accountinfo/{userId}");
+            }
+
+            catch (Exception ex)
+            {
+                errorMessage = $"Error: {ex.Message}";
+            }
+
+
+        }
+
+        else
+        {
+            errorMessage = "UserID not found. You need to be logged in to see your profile.";
+        }
     }
-
-
 
 }
