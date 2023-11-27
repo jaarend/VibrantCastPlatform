@@ -1,0 +1,84 @@
+﻿@page "/memberships"
+@using global::Shared.Models.MembershipType;
+@using Newtonsoft.Json;
+@using Microsoft.AspNetCore.Components.Forms;
+@using Microsoft.AspNetCore.Authorization;
+@using System.Text.Json.Serialization;
+@attribute [Authorize]
+@inject HttpClient Http
+@inject NavigationManager navigation
+
+<PageTitle>Membership Types Index</PageTitle>
+
+<a href="/memberships/create" class="btn btn-primary">Create new Membership</a>
+
+<h3>Membership Types</h3>
+
+@if (_memberships == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+
+                <th>Name</th>
+                <th>Description</th>
+                <th>Monthly Price</th>
+                <th>Yearly Price</th>
+                <th>Artwork Limit</th>
+                <th>Experiences Limit</th>
+                <th>Date Created</th>
+                <th>Date Modified</th>
+
+
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var memberships in _memberships)
+            {
+                <tr>
+                    <td>
+                        @memberships.Name
+                    </td>
+                    <td>
+                        @memberships.Description
+                    </td>
+                    <td>
+                        @memberships.MonthlyAmount
+                    </td>
+                    <td>
+                        @memberships.YearlyAmount
+                    </td>
+                    <td>
+                        @memberships.ArtworkLimit
+                    </td>
+                    <td>
+                        @memberships.ExperiencesLimit
+                    </td>
+                    <td>
+                        @memberships.DateCreated
+                    </td>
+                    <td>
+                        @memberships.DateModified
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+
+@code {
+
+    private IEnumerable<MembershipTypeDetail> _memberships;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _memberships = await Http.GetFromJsonAsync<List<MembershipTypeDetail>>("api/membershiptype");
+    }
+
+
+}

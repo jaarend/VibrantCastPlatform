@@ -26,84 +26,83 @@
                 <p class="card-text">@model.Description</p>
             </div>
         </div>
-
-        <div class="container justify-content-center p-3" style="width: 15rem; background-color: #ddd8d8;">
-            <div class="col d-flex gap-2">
-                <div class="row p-2">
-                    <p class="card-title">Price</p>
-                </div>
-                <div class="row p-2 ms-auto text-end">
-                    <p class="card-text">$@model.Price</p>
-                </div>
-            </div>
-            @* <div class="col d-flex gap-2">
         <div class="row">
-        <p class="card-title">Address</p>
-        </div>
-        <div class="row ms-auto text-end">
-        <p class="card-text">@model.Address, @model.City @model.State @model.Country @model.PostalCode</p>
-        </div>
-        </div> consider putting address somewhere else on this page or leave it off*@
-            <div class="col d-flex gap-2">
-                <div class="row p-2 ">
-                    <p class="card-title">Materials</p>
-                </div>
-                <div class="row p-2 ms-auto text-end">
-                    <p class="card-text">@model.Materials</p>
-                </div>
-            </div>
-            <div class="col d-flex gap-2">
-                <div class="row p-2">
-                    <p class="card-title">Width</p>
-                </div>
-                <div class="row p-2 ms-auto text-end">
-                    <p class="card-text">@model.Width</p>
-                </div>
-            </div>
-            <div class="col d-flex gap-2">
-                <div class="row p-2">
-                    <p class="card-title">Height</p>
-                </div>
-                <div class="row p-2 ms-auto text-end">
-                    <p class="card-text">@model.Height</p>
-                </div>
-            </div>
-        </div>
-
-        @* this will be information on the artist *@
-        @if (userDetail != null)
-        {
-            @* could replace null with a default image *@
-            var imgString = userDetail.ProfileImage != null ? Convert.ToBase64String(userDetail.ProfileImage) : null; 
-
-            @if (errorMessage != null)
-            {
-                <h5 class="text-danger">@errorMessage</h5>
-            }
-
-            <div class="container justify-content-center p-3" style="width: 15rem; background-color: rgb(219, 185, 217);">
+            <div class="container justify-content-center p-3" style="width: 15rem; background-color: #ddd8d8;">
                 <div class="col d-flex gap-2">
                     <div class="row p-2">
-                        <img src="data:image/png;base64,@imgString" alt="Profile Image" srcset="">
+                        <p class="card-title">Price</p>
+                    </div>
+                    <div class="row p-2 ms-auto text-end">
+                        <p class="card-text">$@model.Price</p>
+                    </div>
+                </div>
+                        @* <div class="col d-flex gap-2">
+                    <div class="row">
+                    <p class="card-title">Address</p>
+                    </div>
+                    <div class="row ms-auto text-end">
+                    <p class="card-text">@model.Address, @model.City @model.State @model.Country @model.PostalCode</p>
+                    </div>
+                    </div> consider putting address somewhere else on this page or leave it off*@
+                <div class="col d-flex gap-2">
+                    <div class="row p-2 ">
+                        <p class="card-title">Materials</p>
+                    </div>
+                    <div class="row p-2 ms-auto text-end">
+                        <p class="card-text">@model.Materials</p>
                     </div>
                 </div>
                 <div class="col d-flex gap-2">
+                    <div class="row p-2">
+                        <p class="card-title">Width</p>
+                    </div>
                     <div class="row p-2 ms-auto text-end">
-                        <p class="card-text">@userDetail.FirstName @userDetail.LastName</p>
+                        <p class="card-text">@model.Width</p>
                     </div>
                 </div>
                 <div class="col d-flex gap-2">
-                    <div class="row p-2 ms-auto text-end">
-                        <p class="card-text">@userDetail.ArtistName</p>
+                    <div class="row p-2">
+                        <p class="card-title">Height</p>
                     </div>
-                </div>
-                <div class="col d-flex gap-2">
                     <div class="row p-2 ms-auto text-end">
-                        <p class="card-text">@userDetail.Description</p>
+                        <p class="card-text">@model.Height</p>
                     </div>
                 </div>
             </div>
-        }
+
+        @* this will be information on the artist *@
+            @if (userDetail != null)
+            {
+                @if (errorMessage != null)
+                {
+                    <h5 class="text-danger">@errorMessage</h5>
+                }
+
+                <div class="container justify-content-center p-3" style="width: 15rem; background-color: rgb(219, 185, 217);">
+                    <div class="col d-flex gap-2">
+                        <div class="row p-2">
+                            <img src="data:image/png;base64,@ProfileImg" alt="Profile Image" srcset="">
+                        </div>
+                    </div>
+                    <div class="col d-flex gap-2">
+                        <div class="row p-2 ms-auto text-end">
+                            <p class="card-text">@userDetail.FirstName @userDetail.LastName</p>
+                        </div>
+                    </div>
+                    <div class="col d-flex gap-2">
+                        <div class="row p-2 ms-auto text-end">
+                            <p class="card-text">@userDetail.ArtistName</p>
+                        </div>
+                    </div>
+                    <div class="col d-flex gap-2">
+                        <div class="row p-2 ms-auto text-end">
+                            <p class="card-text">@userDetail.Description</p>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+        
     </div>
 }
 else
@@ -130,6 +129,20 @@ else
             if (model.FullImage != null)
             {
                 return Convert.ToBase64String(model.FullImage);
+            }
+            else
+            {
+                return string.Empty;
+            }
+        }
+    }
+    private string ProfileImg
+    {
+        get
+        {
+            if (userDetail.ProfileImage != null)
+            {
+                return Convert.ToBase64String(userDetail.ProfileImage);
             }
             else
             {
