@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Shared.Models.MembershipType;
 using VibrantCastPlatform.Server.Data;
@@ -53,6 +54,7 @@ namespace Server.Services.MembershipType
                 .Select(m =>
                     new MembershipTypeDetail
                     {
+                        Id = m.Id,
                         Name = m.Name,
                         Description = m.Description,
                         MonthlyAmount = m.MonthlyAmount,
@@ -64,6 +66,61 @@ namespace Server.Services.MembershipType
                     });
 
             return await membershipTypeList.ToListAsync();
+        }
+
+        public async Task<MembershipTypeDetail> GetMembershipTypeDetailByIdAsync(int membershipId)
+        {
+            var entity = await _dbContext
+                .MembershipTypes
+                .FirstOrDefaultAsync(e => e.Id == membershipId);
+
+            if (entity is null)
+                return null;
+
+            var detail = new MembershipTypeDetail
+            {
+                Id = entity.Id,
+                Name = entity.Name,
+                Description = entity.Description,
+                MonthlyAmount = entity.MonthlyAmount,
+                YearlyAmount = entity.YearlyAmount,
+                ArtworkLimit = entity.ArtworkLimit,
+                ExperiencesLimit = entity.ExperiencesLimit,
+                DateCreated = entity.DateCreated,
+                DateModified = entity.DateModified
+            };
+
+            return detail;
+
+        }
+
+        //UPDATE
+
+        public async Task<bool> EditMembershipTypeAsync(MembershipTypeEdit model)
+        {
+            var entity = await _dbContext.MembershipTypes.FindAsync(model.Id);
+
+            entity.Name = model.Name;
+            entity.Description = model.Description;
+            entity.MonthlyAmount = model.MonthlyAmount;
+            entity.YearlyAmount = model.YearlyAmount;
+            entity.ArtworkLimit = model.ArtworkLimit;
+            entity.ExperiencesLimit = model.ExperiencesLimit;
+            entity.DateModified = DateTime.Now;
+
+
+            return await _dbContext.SaveChangesAsync() == 1;
+        }
+
+
+        //DELETE
+        public async Task<bool> DeleteMembershipTypeAsync(int id)
+        {
+            var entity = await _dbContext.MembershipTypes.FindAsync(id);
+
+            _dbContext.MembershipTypes.Remove(entity);
+
+            return await _dbContext.SaveChangesAsync() == 1;
         }
     }
 }

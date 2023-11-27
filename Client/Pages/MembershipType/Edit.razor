@@ -1,0 +1,82 @@
+﻿@page "/memberships/edit/{Id:int}"
+@using global::Shared.Models.MembershipType;
+@using Microsoft.AspNetCore.Authorization;
+@attribute [Authorize]
+@inject HttpClient Http
+@inject NavigationManager navigation
+
+<PageTitle>Edit Membership</PageTitle>
+
+<h1>Membership</h1>
+
+@if (errorMessage != null)
+{
+    <h5 class="text-danger">@errorMessage</h5>
+}
+
+@if (!isLoading)
+{
+
+    <div class="container">
+        <EditForm Model="@model" OnValidSubmit="@HandleSubmit">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="form-group">
+                <label>Name</label>
+                <InputText class="form-control" @bind-Value="model.Name" />
+                <label>Description</label>
+                <InputText class="form-control" @bind-Value="model.Description" />
+                <label>Montly Price</label>
+                <InputNumber class="form-control" @bind-Value="model.MonthlyAmount" />
+                <label>Yearly Price</label>
+                <InputNumber class="form-control" @bind-Value="model.YearlyAmount" />
+                <label>Artwork Limit</label>
+                <InputNumber class="form-control" @bind-Value="model.ArtworkLimit" />
+                <label>Experience Limit</label>
+                <InputNumber class="form-control" @bind-Value="model.ExperiencesLimit" />
+            </div>
+            <button type="submit" class="btn btn-primary btn-block mt-5"> Submit </button>
+        </EditForm>
+    </div>
+}
+else
+{
+    <p>Loading...</p>
+}
+
+
+
+@code {
+
+    [Parameter]
+    public int Id { get; set; }
+    private MembershipTypeEdit model { get; set; }
+
+    private string errorMessage;
+
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        model = await Http.GetFromJsonAsync<MembershipTypeEdit>($"/api/membershiptype/{Id}");
+        isLoading = false;
+    }
+
+    private async void HandleSubmit()
+    {
+        model.DateModified = DateTime.Now;
+
+        var createResponse = await Http.PutAsJsonAsync<MembershipTypeEdit>($"api/membershiptype/edit/{Id}", model);
+
+        if (createResponse.IsSuccessStatusCode)
+        {
+            navigation.NavigateTo("/memberships");
+        }
+        else
+        {
+            errorMessage = "Could not update account information right now. Please try again.";
+        }
+    }
+
+}

@@ -10,9 +10,9 @@
 
 <PageTitle>Membership Types Index</PageTitle>
 
-<a href="/memberships/create" class="btn btn-primary">Create new Membership</a>
 
 <h3>Membership Types</h3>
+<a href="/memberships/create" class="btn btn-primary">Create new Membership</a>
 
 @if (_memberships == null)
 {
@@ -63,6 +63,13 @@ else
                     </td>
                     <td>
                         @memberships.DateModified
+                    </td>
+                    <td>
+                        <div class="text-center justify-content-between w-25">
+                            <a href=@($"/memberships/edit/{memberships.Id}") class="btn btn-outline-primary">Edit</a>
+                            <a href=@($"/memberships/delete/{memberships.Id}") class="btn btn-outline-danger">Delete</a>
+                            <hr />
+                        </div>
                     </td>
                 </tr>
             }

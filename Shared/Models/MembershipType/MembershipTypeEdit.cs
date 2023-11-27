@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Shared.Models.MembershipType
 {
-    public class MembershipTypeDetail
+    public class MembershipTypeEdit
     {
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
@@ -18,10 +18,6 @@ namespace Shared.Models.MembershipType
         public int ArtworkLimit { get; set; }
         public int ExperiencesLimit { get; set; }
 
-        public DateTime DateCreated { get; set; }
-
         public DateTimeOffset? DateModified { get; set; }
-
-
     }
 }

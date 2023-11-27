@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Shared.Models.MembershipType
 {
-    public class MembershipTypeDetail
+    public class MembershipTypeDelete
     {
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
