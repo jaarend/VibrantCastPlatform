@@ -75,6 +75,7 @@ namespace Server.Controllers
             return artworks.ToList();
         }
         
+        [AllowAnonymous]
         [HttpGet("public")]
         public async Task<List<ArtworkDetail>> PublicArtwork()
         {

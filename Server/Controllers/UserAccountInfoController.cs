@@ -79,6 +79,7 @@ namespace Server.Controllers
             return Ok(userAccountInfo);
         }
 
+        [AllowAnonymous]
         [HttpGet("public-users")]
         public async Task<List<UserAccountInfoDetail>> Index()
         {

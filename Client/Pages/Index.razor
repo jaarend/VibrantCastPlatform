@@ -2,6 +2,8 @@
 @using global::Shared.Models.Artwork;
 @using global::Shared.Models.UserAccountInfo;
 @inject HttpClient Http
+@inject HttpClient HttpPublic
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <div class="container">
     <!-- Hero Section -->
@@ -21,7 +23,7 @@
         else
         {
             <div class="row m-3">
-                <h2>Newly Uploaded Art</h2>
+                <h2>Your Uploaded Art</h2>
                 @foreach (var artwork in _newArtworks)
                 {
                     <div class="card col-md-8 mx-auto m-3" style="width: 18rem;">
@@ -73,7 +75,18 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _newArtworks = await Http.GetFromJsonAsync<List<ArtworkDetail>>("api/artwork/public");
-        _artists = await Http.GetFromJsonAsync<List<UserAccountInfoDetail>>("api/profile/accountinfo/public-users");
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+
+        if (authState.User.Identity.IsAuthenticated)
+        {
+            _newArtworks = await Http.GetFromJsonAsync<List<ArtworkDetail>>("api/artwork");
+            _artists = await Http.GetFromJsonAsync<List<UserAccountInfoDetail>>("api/profile/accountinfo/public-users");
+        }
+        else
+        {
+            // Use the HttpPublic client for unauthenticated requests
+            _newArtworks = await HttpPublic.GetFromJsonAsync<List<ArtworkDetail>>("api/artwork/public");
+            _artists = await HttpPublic.GetFromJsonAsync<List<UserAccountInfoDetail>>("api/profile/accountinfo/public-users");
+        }
     }
 }
