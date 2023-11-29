@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Shared.Models.Organization
 {
-    public class OrganizationInfoCreate
+    public class OrganizationInfoEdit
     {
         public int Id { get; set; }
         public byte[] ProfileImage { get; set; }

@@ -1,0 +1,55 @@
+﻿@page "/organization/signup"
+@using global::Shared.Models.Organization;
+@using Microsoft.AspNetCore.Authorization;
+@using Microsoft.AspNetCore.Components.Forms;
+@attribute [Authorize]
+@inject HttpClient Http
+@inject NavigationManager navigation
+
+<PageTitle>Sign up</PageTitle>
+
+<h1>Create Your Organization</h1>
+
+@if (errorMessage != null)
+{
+    <h5 class="text-danger">@errorMessage</h5>
+}
+
+<div class="container">
+    @* this part will create the Organization, later will handle membership differently *@
+
+        <EditForm Model="@orgModel" OnValidSubmit="@CreateOrg">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group">
+            <label>Pick your membership.</label>
+            <InputNumber class="form-control" @bind-Value="orgModel.MembershipTypeId" />
+        </div>
+        <button type="submit" class="btn btn-primary btn-block mt-5"> Submit </button>
+    </EditForm>
+</div>
+
+
+@code {
+
+    private readonly OrganizationCreate orgModel = new();
+    private string errorMessage;
+
+    private async void CreateOrg()
+    {
+        
+
+        var createResponse = await Http.PostAsJsonAsync<OrganizationCreate>("api/organization/signup", orgModel);
+
+        if (createResponse.IsSuccessStatusCode)
+        {
+            navigation.NavigateTo("/organization/signup/profile");
+        }
+        else
+        {
+            errorMessage = "Could not save account information right now. Please try again.";
+        }
+    }
+
+}

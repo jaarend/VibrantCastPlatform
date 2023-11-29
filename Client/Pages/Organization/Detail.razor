@@ -1,0 +1,119 @@
+﻿@page "/organizations/{Id:int}"
+@using global::Shared.Models.Organization;
+@using Microsoft.AspNetCore.Authorization;
+@attribute [Authorize]
+@inject HttpClient Http
+@inject NavigationManager navigation
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<PageTitle>Organization</PageTitle>
+
+
+@* this should be a list of organizations *@
+<h1>Organization</h1>
+
+@if (errorMessage != null)
+{
+    <h5 class="text-danger">@errorMessage</h5>
+}
+
+<div class="container">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between">
+            <span>Profile</span>
+        </div>
+
+        @if (OrgInfoDetail != null)
+        {
+            if (OrgInfoDetail.ProfileImage != null)
+            {
+                var imgString = Convert.ToBase64String(OrgInfoDetail.ProfileImage);
+                <div class="card" style="width: 18rem;">
+                    <img src="data:image/png;base64,@imgString" alt="Profile Image" srcset="">
+                </div>
+            }
+            <div class="card-body">
+                <h4 class="card-title">@OrgInfoDetail.OrganizationName</h4>
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">@OrgInfoDetail.Description</h4>
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">$ @OrgInfoDetail.CommissionPrice</h4>
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">@OrgInfoDetail.Address</h4>
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">@OrgInfoDetail.City</h4>
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">@OrgInfoDetail.State</h4>
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">@OrgInfoDetail.Country</h4>
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">@OrgInfoDetail.PostalCode</h4>
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">@OrgInfoDetail.Website</h4>
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">@OrgInfoDetail.Booking</h4>
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">@OrgInfoDetail.Instagram</h4>
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">@OrgInfoDetail.Facebook</h4>
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">@OrgInfoDetail.TwitterX</h4>
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">@OrgInfoDetail.LinkedIn</h4>
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">@OrgInfoDetail.TikTok</h4>
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">@OrgInfoDetail.SnapChat</h4>
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">@OrgInfoDetail.WhatsApp</h4>
+            </div>
+        }
+        else
+        {
+            <p>loading...</p>
+        }
+    </div>
+
+
+</div>
+
+
+@code {
+
+    [Parameter]
+    public int Id { get; set; }
+    public OrgInfoDetail OrgInfoDetail { get; set; } = new OrgInfoDetail();
+
+    private string errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        try
+        {
+            OrgInfoDetail = await Http.GetFromJsonAsync<OrgInfoDetail>($"/api/organization/{Id}");
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error: {ex.Message}";
+        }
+
+    }
+
+}
