@@ -9,11 +9,13 @@ namespace Server.Services.MediumTags
     public interface IMediumTagService
     {
         Task<bool> CreateMediumTagAsync(MediumTagCreate model);
+        Task<IEnumerable<MediumTagListName>> GetAllMediumTagsNameAsync();
 
         Task<IEnumerable<MediumTagDetail>> GetAllMediumTagsAsync();
 
-        Task<bool> UpdateMediumTag(MediumTagEdit model);
+        Task<MediumTagEdit> GetMediumTagEditByIdAsync(int mediumTagId);
 
+        Task<bool> UpdateMediumTag(MediumTagEdit model, int mediumTagId);
         Task<bool> DeleteMediumTagAsync(int mediumTagId);
         
     }

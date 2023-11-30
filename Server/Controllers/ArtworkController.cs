@@ -11,6 +11,8 @@ using Server.Services.Artwork;
 using Shared.Models.Artwork;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Authorization;
+using Shared.Models.Artwork.ArtworkMapping;
+using Shared.Models.MediumTags;
 
 namespace Server.Controllers
 {
@@ -63,6 +65,19 @@ namespace Server.Controllers
             else return UnprocessableEntity();
         }
 
+        [HttpPost("create-mediumtag")]
+        public async Task<IActionResult> AddMediumTags(ArtworkMediumTagMapping model)
+        {
+            if (model == null) return BadRequest();
+
+            if (!SetUserIdInService()) return Unauthorized();
+
+            bool wasSuccessful = await _artworkService.AddMediumTagToArtwork(model);
+
+            if(wasSuccessful) return Ok();
+            else return UnprocessableEntity();
+        }
+
         //READ
 
         [HttpGet]
@@ -96,6 +111,18 @@ namespace Server.Controllers
             return Ok(artwork);
         }
 
+        [HttpGet("mediumtag/{artworkId}")]
+        public async Task<List<MediumTagListName>> GetMediumTag(int artworkId)
+        {
+
+            if (!SetUserIdInService()) return new List<MediumTagListName>();
+
+            var tags = await _artworkService.GetAllMediumTagsOnArt(artworkId);
+
+            return tags.ToList();
+
+        }
+
         //UPDATE
 
         [HttpPut("edit/{id}")]
@@ -114,6 +141,8 @@ namespace Server.Controllers
             return BadRequest();
 
         }
+
+        //just need the create medium and delete...
 
 
         //DELETE

@@ -1,5 +1,7 @@
 ﻿@page "/artwork/{Id:int}"
 @using global::Shared.Models.Artwork;
+@using global::Shared.Models.MediumTags;
+@using global::Shared.Models.Artwork.ArtworkMapping;
 @using global::Shared.Models.UserAccountInfo;
 @using Newtonsoft.Json;
 @using Microsoft.AspNetCore.Components.Forms;
@@ -36,14 +38,14 @@
                         <p class="card-text">$@model.Price</p>
                     </div>
                 </div>
-                        @* <div class="col d-flex gap-2">
-                    <div class="row">
-                    <p class="card-title">Address</p>
-                    </div>
-                    <div class="row ms-auto text-end">
-                    <p class="card-text">@model.Address, @model.City @model.State @model.Country @model.PostalCode</p>
-                    </div>
-                    </div> consider putting address somewhere else on this page or leave it off*@
+                @* <div class="col d-flex gap-2">
+            <div class="row">
+            <p class="card-title">Address</p>
+            </div>
+            <div class="row ms-auto text-end">
+            <p class="card-text">@model.Address, @model.City @model.State @model.Country @model.PostalCode</p>
+            </div>
+            </div> consider putting address somewhere else on this page or leave it off*@
                 <div class="col d-flex gap-2">
                     <div class="row p-2 ">
                         <p class="card-title">Materials</p>
@@ -51,6 +53,18 @@
                     <div class="row p-2 ms-auto text-end">
                         <p class="card-text">@model.Materials</p>
                     </div>
+                </div>
+                <div class="col d-flex gap-2">
+                    <div class="row p-2 ">
+                        <p class="card-title">Mediums</p>
+                    </div>
+                    @if (tags != null)
+                    {
+                        @foreach (var tag in tags)
+                        {
+                            <p class="card-text">@tag.Name</p>
+                        }
+                    }
                 </div>
                 <div class="col d-flex gap-2">
                     <div class="row p-2">
@@ -70,7 +84,7 @@
                 </div>
             </div>
 
-        @* this will be information on the artist *@
+            @* this will be information on the artist *@
             @if (userDetail != null)
             {
                 @if (errorMessage != null)
@@ -102,7 +116,7 @@
                 </div>
             }
         </div>
-        
+
     </div>
 }
 else
@@ -119,6 +133,10 @@ else
     public int Id { get; set; }
     private ArtworkDetail model { get; set; } = new ArtworkDetail();
     private UserAccountInfoDetail userDetail { get; set; } = new UserAccountInfoDetail();
+
+    private IEnumerable<MediumTagListName> tags;
+
+    private int SelectedMediumTagId;
 
     private string? errorMessage;
 
@@ -159,6 +177,10 @@ else
         try
         {
             model = await Http.GetFromJsonAsync<ArtworkDetail>($"/api/artwork/{Id}");
+            //gets medium tags assoicated with artwork
+            tags = await Http.GetFromJsonAsync<IEnumerable<MediumTagListName>>($"api/artwork/mediumtag/{Id}");
+
+
         }
         catch (Exception ex)
         {

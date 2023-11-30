@@ -44,8 +44,10 @@ else
                         @{
                             var imgString = Convert.ToBase64String(artwork.FullImage);
                         }
-                        <div class="card" style="width: 18rem;">
-                            <img src="data:image/png;base64,@imgString" alt="Artwork Image" srcset="">
+                        <div class="card col-md-8 mx-auto m-3" style="width: 18rem;">
+                            <a href="@($"/artwork/{artwork.Id}")">
+                                <img src="data:image/png;base64,@imgString" alt="Artwork Image" srcset="" class="card-img-top">
+                            </a>
                         </div>
                     </td>
                     <td>

@@ -42,16 +42,34 @@ namespace Server.Controllers
             return tags.ToList();
         }
 
+        [HttpGet("names")]
+        public async Task<List<MediumTagListName>> TagNames()
+        {
+            var tags = await _mediumTagService.GetAllMediumTagsNameAsync();
+
+            return tags.ToList();
+        }
+        [HttpGet("edit/{id}")]
+        public async Task<IActionResult> GetMediumTagByIdEdit(int id)
+        {
+            var tag = await _mediumTagService.GetMediumTagEditByIdAsync(id);
+
+            if(tag == null) return NotFound();
+
+            return Ok(tag);
+        }
+
+
         //UPDATE
 
         [HttpPut("edit/{id}")]
-        public async Task<IActionResult> EditMediumTag(int id, MediumTagEdit model)
+        public async Task<IActionResult> EditMediumTag( MediumTagEdit model, int id)
         {
             if (model == null || !ModelState.IsValid) return BadRequest();
 
             if (model.Id != id) return BadRequest();
 
-            bool wasSuccessful = await _mediumTagService.UpdateMediumTag(model);
+            bool wasSuccessful = await _mediumTagService.UpdateMediumTag(model, id);
 
             if (wasSuccessful) return Ok();
 

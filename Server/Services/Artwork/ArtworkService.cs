@@ -6,9 +6,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Shared.Models.Artwork;
+using Shared.Models.Artwork.ArtworkMapping;
 using VibrantCastPlatform.Server.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Shared.Models.MediumTags;
 
 namespace Server.Services.Artwork
 {
@@ -59,6 +62,21 @@ namespace Server.Services.Artwork
                 return false;
             }
         }
+
+        //create ArtworkMediumTagMapping
+        public async Task<bool> AddMediumTagToArtwork(ArtworkMediumTagMapping model)
+        {
+            var artwork = _dbContext.Artworks.Find(model.ArtworksId);
+            var mediumtag = _dbContext.MediumTags.Find(model.MediumTagsId);
+
+            if(artwork == null || mediumtag == null)
+                return false;
+
+            artwork.MediumTags.Add(mediumtag);
+
+            return await _dbContext.SaveChangesAsync() == 1;
+        }
+
 
         //READ
 
@@ -145,6 +163,21 @@ namespace Server.Services.Artwork
 
             return detail;
 
+        }
+
+        public async Task<IEnumerable<MediumTagListName>> GetAllMediumTagsOnArt(int artworkId)
+        {
+            var entity = _dbContext
+                .Artworks
+                .Include(e => e.MediumTags)
+                .First(e => e.Id == artworkId);
+                
+            var mediumTags = entity.MediumTags;
+            
+            return mediumTags.Select(m=> new MediumTagListName
+                {
+                    Name = m.Name,
+                });
         }
 
         //UPDATE

@@ -8,7 +8,7 @@ using VibrantCastPlatform.Server.Data;
 
 namespace Server.Services.MediumTags
 {
-    public class MediumTagService
+    public class MediumTagService : IMediumTagService
     {
         private readonly ApplicationDbContext _dbContext;
 
@@ -52,21 +52,54 @@ namespace Server.Services.MediumTags
                     });
             return await mediumTagDetails.ToListAsync();
         }
+        public async Task<IEnumerable<MediumTagListName>> GetAllMediumTagsNameAsync()
+        {
+            var mediumTagNames = _dbContext
+                .MediumTags
+                .Select(n => 
+                    new MediumTagListName
+                    {
+                        Id = n.Id,
+                        Name = n.Name,
+                    });
+            return await mediumTagNames.ToListAsync();
+        }
+
+        public async Task<MediumTagEdit> GetMediumTagEditByIdAsync(int mediumTagId)
+        {
+            var entity = await _dbContext
+                .MediumTags
+                .FirstOrDefaultAsync(e => e.Id == mediumTagId);
+
+            if (entity is null)
+                return null;
+
+            var detail = new MediumTagEdit
+            {
+                Id = entity.Id,
+                Name = entity.Name,
+                Description = entity.Description,
+                DateModified = entity.DateModified
+            };
+
+            return detail;
+
+        }
 
         //UPDATE
 
-        public async Task<bool> UpdateMediumTag(MediumTagEdit model)
+        public async Task<bool> UpdateMediumTag(MediumTagEdit model, int mediumTagId)
         {
             if(model == null)
                 return false;
 
-            var entity = await _dbContext.MediumTags.FindAsync(model.Id);
+            var entity = await _dbContext.MediumTags.FindAsync(mediumTagId);
 
-            if(entity?.Id != model.Id) return false;
+            if(entity?.Id != mediumTagId) return false;
             
             entity.Name = model.Name;
             entity.Description = model.Description;
-            entity.DateModified = DateTime.Now;
+            entity.DateModified = model.DateModified;
 
             return await _dbContext.SaveChangesAsync() == 1;
         }

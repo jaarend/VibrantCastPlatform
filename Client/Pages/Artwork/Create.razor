@@ -1,5 +1,7 @@
 ﻿@page "/artwork/create"
 @using global::Shared.Models.Artwork;
+@using global::Shared.Models.Artwork.ArtworkMapping;
+@using global::Shared.Models.MediumTags;
 @using Newtonsoft.Json;
 @using Microsoft.AspNetCore.Components.Forms;
 @using Microsoft.AspNetCore.Authorization;
@@ -63,6 +65,18 @@
             <InputText class="form-control" @bind-Value="model.Materials" />
         </div>
         <div class="form-group">
+            <label>Mediums</label>
+            <InputSelect class="form-control" @bind-Value="SelectedMediumTagId">
+                @if (tags != null)
+                {
+                    @foreach (var _tag in tags)
+                    {
+                        <option value="@_tag.Id">@_tag.Name</option>
+                    }
+                }
+            </InputSelect>
+        </div>
+        <div class="form-group">
             <label>Width</label>
             <InputText class="form-control" @bind-Value="model.Width" />
         </div>
@@ -86,6 +100,15 @@
 
     private readonly ArtworkCreate model = new();
 
+    private ArtworkDetail detail { get; set; } = new ArtworkDetail();
+
+
+    private ArtworkMediumTagMapping tagMapping { get; set; } = new();
+
+    private IEnumerable<MediumTagListName> tags;
+
+    private int SelectedMediumTagId;
+
     private string errorMessage;
 
     private IBrowserFile selectedFile;
@@ -96,6 +119,12 @@
     private byte[] buffer;
 
     string imgUrl = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        tags = await Http.GetFromJsonAsync<IEnumerable<MediumTagListName>>($"api/mediumtag/names");
+    }
+    
     public async Task OnChooseFile(InputFileChangeEventArgs e)
     {
         var file = e.File;
@@ -123,11 +152,22 @@
     private async Task CreateArtwork()
     {
 
+        //get artwork Id and medium Id to pass into AddMediumTagToArtwork
+
+        //remember to add it to the controller
+
         var response = await Http.PostAsJsonAsync<ArtworkCreate>("api/artwork/create", model);
 
         if (response.IsSuccessStatusCode)
         {
-            navigation.NavigateTo("/profile");
+            @* var mediumTagModel = new ArtworkMediumTagMapping
+{
+ArtworksId = Id,
+MediumTagsId = SelectedMediumTagId
+};
+
+var result = await Http.PostAsJsonAsync<ArtworkMediumTagMapping>("api/artwork/create-mediumtag", mediumTagModel); *@
+            navigation.NavigateTo("/artwork");
         }
         else
         {

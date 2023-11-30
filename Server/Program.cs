@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using Server.Services.Artwork;
 using Server.Services.Inquiry;
+using Server.Services.MediumTags;
 using Server.Services.MembershipType;
 using Server.Services.Organization;
 using Server.Services.UserAccountInfo;
@@ -18,6 +19,7 @@ builder.Services.AddScoped<IArtworkService, ArtworkService>();
 builder.Services.AddScoped<IInquiryService, InquiryService>();
 builder.Services.AddScoped<IMembershipTypeService, MembershipTypeService>();
 builder.Services.AddScoped<IOrganizationService, OrganizationService>();
+builder.Services.AddScoped<IMediumTagService, MediumTagService>();
 
 
 
