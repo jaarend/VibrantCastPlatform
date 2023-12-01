@@ -21,8 +21,10 @@ public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>
     public DbSet<Collection> Collections {get; set;}
     public DbSet<Experience> Experiences {get; set;}
     public DbSet<ExperienceType> ExperienceTypes {get; set;}
+    
+    public DbSet<Interaction> Interactions {get; set;}
 
-    //leaving out interactions right now
+    public DbSet<InteractionType> InteractionTypes {get; set;}
 
     public DbSet<MediumTag> MediumTags {get; set;}
 
