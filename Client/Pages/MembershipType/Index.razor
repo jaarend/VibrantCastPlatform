@@ -1,17 +1,20 @@
 ﻿@page "/memberships"
 @using global::Shared.Models.MembershipType;
 @using Newtonsoft.Json;
+@using Microsoft.AspNetCore.Components;
 @using Microsoft.AspNetCore.Components.Forms;
 @using Microsoft.AspNetCore.Authorization;
 @using System.Text.Json.Serialization;
-@attribute [Authorize]
+@using System.Diagnostics;
+@attribute [Authorize(Roles = "Admin")]
 @inject HttpClient Http
 @inject NavigationManager navigation
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <PageTitle>Membership Types Index</PageTitle>
 
 
-<h3>Membership Types</h3>
+<h3>Membership Types (admin only)</h3>
 <a href="/memberships/create" class="btn btn-primary">Create new Membership</a>
 
 @if (_memberships == null)
@@ -82,8 +85,21 @@ else
 
     private IEnumerable<MembershipTypeDetail> _memberships;
 
+    private string[] userRoles;
+
     protected override async Task OnInitializedAsync()
     {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        userRoles = user.Claims
+            .Where(c => c.Type == System.Security.Claims.ClaimTypes.Role)
+            .Select(c => c.Value)
+            .ToArray();
+
+
+        Debug.WriteLine($"User Roles: {string.Join(", ", userRoles)}");
+
         _memberships = await Http.GetFromJsonAsync<List<MembershipTypeDetail>>("api/membershiptype");
     }
 

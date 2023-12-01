@@ -1,0 +1,39 @@
+﻿@page "/admin"
+@using global::Shared.Models.MembershipType;
+@using Newtonsoft.Json;
+@using Microsoft.AspNetCore.Components;
+@using Microsoft.AspNetCore.Components.Forms;
+@using Microsoft.AspNetCore.Authorization;
+@using System.Text.Json.Serialization;
+@using System.Diagnostics;
+@attribute [Authorize(Roles = "Admin")]
+@inject HttpClient Http
+@inject NavigationManager navigation
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<PageTitle>Admin Dashboard</PageTitle>
+
+
+<h3>Admin Dashboard</h3>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Memberships</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+                <a href="/memberships" class="btn btn-primary">Go to Memberships</a>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+
+
+@code {
+
+
+}
