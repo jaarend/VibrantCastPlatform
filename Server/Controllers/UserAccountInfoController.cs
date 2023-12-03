@@ -31,7 +31,7 @@ namespace Server.Controllers
         private string GetUserId()
         {
             string userIdClaim = User.Claims.First(i => i.Type == ClaimTypes.NameIdentifier).Value;
-            if(userIdClaim == null)
+            if (userIdClaim == null)
                 return null;
             return userIdClaim;
         }
@@ -39,18 +39,18 @@ namespace Server.Controllers
         private bool SetUserIdInService()
         {
             var userId = GetUserId();
-            if(userId == null)
+            if (userId == null)
                 return false;
-        
+
             _userAccountInfoService.SetUserId(userId);
             return true;
         }
         private bool SetUserIdInUserService()
         {
             var userId = GetUserId();
-            if(userId == null)
+            if (userId == null)
                 return false;
-        
+
             _userService.SetUserId(userId);
             return true;
         }
@@ -59,13 +59,13 @@ namespace Server.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(UserAccountInfoCreate model)
         {
-            if(model == null) return BadRequest();
+            if (model == null) return BadRequest();
 
-            if(!SetUserIdInService()) return Unauthorized();
+            if (!SetUserIdInService()) return Unauthorized();
 
             bool wasSuccessful = await _userAccountInfoService.CreateUserAccountInfoAsync(model);
 
-            if(wasSuccessful) return Ok();
+            if (wasSuccessful) return Ok();
             else return UnprocessableEntity();
         }
 
@@ -78,7 +78,7 @@ namespace Server.Controllers
 
             var userAccountInfo = await _userAccountInfoService.GetUserAccountInfoByIdAsync(userId);
 
-            if(userAccountInfo == null) return NotFound();
+            if (userAccountInfo == null) return NotFound();
 
             return Ok(userAccountInfo);
         }
@@ -88,7 +88,7 @@ namespace Server.Controllers
         {
             var userAccountInfo = await _userAccountInfoService.GetUserAccountInfoByIdAsync(userId);
 
-            if(userAccountInfo == null) return NotFound();
+            if (userAccountInfo == null) return NotFound();
 
             return Ok(userAccountInfo);
         }
@@ -102,32 +102,45 @@ namespace Server.Controllers
             return publicUsers.ToList();
         }
 
+        [HttpGet("membership-status/{userId}")]
+        public async Task<IActionResult> MembershipStatus(string userId)
+        {
+            if (userId == null) return BadRequest();
+
+            if (!SetUserIdInUserService()) return Unauthorized();
+
+            var membershipDetail = await _userService.GetUserMembership(userId);
+
+            if (membershipDetail != null) return Ok(membershipDetail);
+            else return UnprocessableEntity();
+        }
+
 
         //UPDATE
         [HttpPut]
         public async Task<IActionResult> Edit(UserAccountInfoEdit model)
         {
-            if(model == null) return BadRequest();
+            if (model == null) return BadRequest();
 
-            if(!SetUserIdInService()) return Unauthorized();
+            if (!SetUserIdInService()) return Unauthorized();
 
             bool wasSuccessful = await _userAccountInfoService.EditUserAccountInfoAsync(model);
 
-            if(wasSuccessful) return Ok();
+            if (wasSuccessful) return Ok();
             else return UnprocessableEntity();
         }
 
         //update membership
         [HttpPut("membership-upgrade")]
-        public async Task<IActionResult> UpgradeMembership (UserMembershipUpgrade model)
+        public async Task<IActionResult> UpgradeMembership(UserMembershipUpgrade model)
         {
-            if(model == null) return BadRequest();
+            if (model == null) return BadRequest();
 
-            if(!SetUserIdInUserService()) return Unauthorized();
+            if (!SetUserIdInUserService()) return Unauthorized();
 
             bool wasSuccessful = await _userService.UpgradeMembership(model);
 
-            if(wasSuccessful) return Ok();
+            if (wasSuccessful) return Ok();
             else return UnprocessableEntity();
         }
 

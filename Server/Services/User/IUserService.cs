@@ -10,5 +10,7 @@ namespace Server.Services.User
     {
         void SetUserId(string userId);
         Task<bool> UpgradeMembership(UserMembershipUpgrade model);
+
+        Task<UserMembershipInfo> GetUserMembership(string userId);
     }
 }

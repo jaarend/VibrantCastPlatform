@@ -1,5 +1,6 @@
 ﻿@page "/profile"
 @using global::Shared.Models.UserAccountInfo;
+@using global::Shared.Models.User;
 @using Microsoft.AspNetCore.Authorization;
 @attribute [Authorize]
 @inject HttpClient Http
@@ -9,6 +10,23 @@
 <PageTitle>Profile</PageTitle>
 
 <h1>Profile</h1>
+
+@if (MembershipType != null)
+{
+    @switch (MembershipType.MembershipTypeId)
+    {
+        case 1:
+            <p>Free Trial</p>
+            <a href="/profile/upgrade" class="btn btn-primary">Upgrade Account</a>
+            break;
+        case 2:
+            <p>Premium</p>
+            break;
+        default:
+            <p>You are not a member.</p>
+            break;
+    }
+}
 
 @if (errorMessage != null)
 {
@@ -27,7 +45,7 @@
         @if (UserAccountInfo != null)
         {
             var imgString = Convert.ToBase64String(UserAccountInfo.ProfileImage);
-            
+
             <div class="card" style="width: 18rem;">
                 <img src="data:image/png;base64,@imgString" alt="Profile Image" srcset="">
             </div>
@@ -99,6 +117,8 @@
 
     private UserAccountInfoDetail UserAccountInfo { get; set; }
 
+    private UserMembershipInfo MembershipType { get; set; }
+
     private string errorMessage;
 
     protected override async Task OnInitializedAsync()
@@ -113,11 +133,12 @@
             try
             {
                 UserAccountInfo = await Http.GetFromJsonAsync<UserAccountInfoDetail>($"/api/profile/accountinfo/{userId}");
+
+                MembershipType = await Http.GetFromJsonAsync<UserMembershipInfo>($"api/profile/accountinfo/membership-status/{userId}");
             }
 
             catch (Exception ex)
             {
-                navigation.NavigateTo("/register/accountinfo");
                 errorMessage = $"Error: {ex.Message}";
             }
 
