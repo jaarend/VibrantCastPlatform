@@ -6,7 +6,9 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Server.Services.User;
 using Server.Services.UserAccountInfo;
+using Shared.Models.User;
 using Shared.Models.UserAccountInfo;
 
 namespace Server.Controllers
@@ -17,9 +19,12 @@ namespace Server.Controllers
     {
         private readonly IUserAccountInfoService _userAccountInfoService;
 
-        public UserAccountInfoController(IUserAccountInfoService userAccountInfoService)
+        private readonly IUserService _userService;
+
+        public UserAccountInfoController(IUserAccountInfoService userAccountInfoService, IUserService userService)
         {
             _userAccountInfoService = userAccountInfoService;
+            _userService = userService;
         }
 
         //may separate this out into user services
@@ -38,6 +43,15 @@ namespace Server.Controllers
                 return false;
         
             _userAccountInfoService.SetUserId(userId);
+            return true;
+        }
+        private bool SetUserIdInUserService()
+        {
+            var userId = GetUserId();
+            if(userId == null)
+                return false;
+        
+            _userService.SetUserId(userId);
             return true;
         }
 
@@ -98,6 +112,20 @@ namespace Server.Controllers
             if(!SetUserIdInService()) return Unauthorized();
 
             bool wasSuccessful = await _userAccountInfoService.EditUserAccountInfoAsync(model);
+
+            if(wasSuccessful) return Ok();
+            else return UnprocessableEntity();
+        }
+
+        //update membership
+        [HttpPut("membership-upgrade")]
+        public async Task<IActionResult> UpgradeMembership (UserMembershipUpgrade model)
+        {
+            if(model == null) return BadRequest();
+
+            if(!SetUserIdInUserService()) return Unauthorized();
+
+            bool wasSuccessful = await _userService.UpgradeMembership(model);
 
             if(wasSuccessful) return Ok();
             else return UnprocessableEntity();

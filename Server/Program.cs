@@ -8,6 +8,7 @@ using Server.Services.Inquiry;
 using Server.Services.MediumTags;
 using Server.Services.MembershipType;
 using Server.Services.Organization;
+using Server.Services.User;
 using Server.Services.UserAccountInfo;
 using VibrantCastPlatform.Server.Data;
 using VibrantCastPlatform.Server.Models;
@@ -22,6 +23,7 @@ builder.Services.AddScoped<IInquiryService, InquiryService>();
 builder.Services.AddScoped<IMembershipTypeService, MembershipTypeService>();
 builder.Services.AddScoped<IOrganizationService, OrganizationService>();
 builder.Services.AddScoped<IMediumTagService, MediumTagService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 
 
