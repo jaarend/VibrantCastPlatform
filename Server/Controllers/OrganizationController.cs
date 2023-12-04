@@ -160,6 +160,17 @@ namespace Server.Controllers
         //DELETE
 
         //allow members to be delete from an organization
-        
+        [HttpDelete("delete-org-user-mapping/{userId}")]
+        public async Task<IActionResult> DeleteOrgUserMapping(string userId)
+        {
+            if (!SetUserIdInService()) return Unauthorized();
+
+            bool wasSuccessful = await _organizationService.DeleteOrgUserMapping(userId);
+
+            if (!wasSuccessful) return BadRequest();
+
+            return Ok();
+
+        }
     }
 }
