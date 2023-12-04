@@ -67,6 +67,19 @@ namespace Server.Controllers
             else return UnprocessableEntity();
         }
 
+        [HttpPost("add-members")]
+        public async Task<IActionResult> AddMemberUserToOrg(OrgUserMappingCreate model)
+        {
+            if (model == null || model.UserId == null) return BadRequest();
+
+            if (!SetUserIdInService()) return Unauthorized();
+
+            bool wasSuccessful = await _organizationService.MapMemberUserToOrgAsync(model);
+
+            if (wasSuccessful) return Ok();
+            else return UnprocessableEntity();
+        }
+
 
         //READ
 
@@ -91,9 +104,19 @@ namespace Server.Controllers
 
             var mapping = await _organizationService.CheckOrgUserMapping(userId);
 
-            if(mapping == null) return NotFound();
+            if (mapping == null) return NotFound();
 
             return Ok(mapping);
+        }
+
+        [HttpGet("org-mapped-users/{orgId}")]
+        public async Task<List<OrgUserMappingDetail>> GetOrgUserMappingDetailsAsync(int orgId)
+        {
+            if (!SetUserIdInService()) return new List<OrgUserMappingDetail>();
+
+            var orgMappingDetails = await _organizationService.GetOrgUserMembersMapping(orgId);
+
+            return orgMappingDetails.ToList();
         }
 
         //get org profile
@@ -128,10 +151,15 @@ namespace Server.Controllers
 
             var orgEdit = await _organizationService.EditOrgInfoAsync(model);
 
-            if(orgEdit == false) return NotFound();
+            if (orgEdit == false) return NotFound();
 
             return Ok(orgEdit);
 
         }
+
+        //DELETE
+
+        //allow members to be delete from an organization
+        
     }
 }

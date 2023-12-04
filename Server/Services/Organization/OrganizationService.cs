@@ -38,7 +38,7 @@ namespace Server.Services.Organization
 
             var orgCheck = await _dbContext.SaveChangesAsync() == 1;
 
-            if (await MapUserToOrgAsync(_userId, entity.Id) && orgCheck)
+            if (await MapAdminUserToOrgAsync(_userId, entity.Id) && orgCheck)
                 return true;
             else
                 return false;
@@ -47,13 +47,25 @@ namespace Server.Services.Organization
 
         //map user to admin of org
 
-        public async Task<bool> MapUserToOrgAsync(string userId, int orgId)
+        public async Task<bool> MapAdminUserToOrgAsync(string userId, int orgId)
         {
             var userMapping = new Models.OrganizationUserMapping
             {
                 UserId = userId,
                 OrganizationId = orgId,
                 IsAdmin = true
+            };
+            _dbContext.OrganizationUserMapping.Add(userMapping);
+
+            return await _dbContext.SaveChangesAsync() == 1;
+        }
+        public async Task<bool> MapMemberUserToOrgAsync(OrgUserMappingCreate model)
+        {
+            var userMapping = new Models.OrganizationUserMapping
+            {
+                UserId = model.UserId,
+                OrganizationId = model.OrganizationId,
+                IsAdmin = false
             };
             _dbContext.OrganizationUserMapping.Add(userMapping);
 
@@ -128,6 +140,20 @@ namespace Server.Services.Organization
             }
             else
                 return null;
+
+        }
+        public async Task<IEnumerable<OrgUserMappingDetail>> GetOrgUserMembersMapping(int orgId)
+        {
+            var entity = _dbContext
+                .OrganizationUserMapping
+                .Where(e => e.OrganizationId == orgId)
+                .Select(n => new OrgUserMappingDetail
+                {
+                    UserId = n.UserId,
+                    IsAdmin = n.IsAdmin
+                });
+
+            return await entity.ToListAsync();
 
         }
 

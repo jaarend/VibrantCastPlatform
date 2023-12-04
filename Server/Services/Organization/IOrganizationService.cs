@@ -13,8 +13,12 @@ namespace Server.Services.Organization
         Task<bool> CheckIfOrgExists(int orgId);
         Task<OrgUserMappingDetail> CheckOrgUserMapping(string userId);
 
-        Task<bool> MapUserToOrgAsync(string userId, int orgId);
+        Task<bool> MapAdminUserToOrgAsync(string userId, int orgId);
+
+        Task<bool> MapMemberUserToOrgAsync(OrgUserMappingCreate model);
         Task<bool> CreateOrganizationInfoAsync(OrganizationInfoCreate model);
+
+        Task<IEnumerable<OrgUserMappingDetail>> GetOrgUserMembersMapping(int orgId);
         Task<IEnumerable<OrgInfoDetail>> GetAllOrgInfoAsync();
         Task<OrgInfoDetail> GetOrgInfoByIdAsync(int orgId);
 

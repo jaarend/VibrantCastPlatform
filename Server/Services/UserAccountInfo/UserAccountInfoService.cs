@@ -99,6 +99,7 @@ namespace Server.Services.UserAccountInfo
 
                 new UserAccountInfoDetail
                 {
+                    Id = n.Id,
                     ProfileImage = n.ProfileImage,
                     ArtistName = n.ArtistName,
                     FirstName = n.FirstName,
