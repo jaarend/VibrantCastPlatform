@@ -16,15 +16,11 @@
 
     <!-- Newly Uploaded Art Section -->
     <div class="col">
-        @if (_newArtworks == null)
-        {
-            <p><em>Loading...</em></p>
-        }
-        else
+        @if (_artistWorks != null && _artistWorks.Any())
         {
             <div class="row m-3">
                 <h2>Your Uploaded Art</h2>
-                @foreach (var artwork in _newArtworks)
+                @foreach (var artwork in _artistWorks)
                 {
                     <div class="card col-md-8 mx-auto m-3" style="width: 18rem;">
                         <a href="@($"/artwork/{artwork.Id}")">
@@ -36,6 +32,13 @@
                         </div>
                     </div>
                 }
+            </div>
+        }
+        else
+        {
+            <div class="row m-3">
+                <h2>Upload your first artwork!</h2>
+                <a class="btn btn-primary btn-lg" href="/artwork/create" role="button">Create</a>
             </div>
         }
 
@@ -70,7 +73,7 @@
 
 
 @code {
-    private IEnumerable<ArtworkDetail> _newArtworks;
+    private IEnumerable<ArtworkDetail> _artistWorks;
     private IEnumerable<UserAccountInfoDetail> _artists;
 
     protected override async Task OnInitializedAsync()
@@ -79,14 +82,9 @@
 
         if (authState.User.Identity.IsAuthenticated)
         {
-            _newArtworks = await Http.GetFromJsonAsync<List<ArtworkDetail>>("api/artwork");
+            _artistWorks = await Http.GetFromJsonAsync<List<ArtworkDetail>>("api/artwork");
             _artists = await Http.GetFromJsonAsync<List<UserAccountInfoDetail>>("api/profile/accountinfo/public-users");
         }
-        else
-        {
-            // Use the HttpPublic client for unauthenticated requests
-            _newArtworks = await HttpPublic.GetFromJsonAsync<List<ArtworkDetail>>("api/artwork/public");
-            _artists = await HttpPublic.GetFromJsonAsync<List<UserAccountInfoDetail>>("api/profile/accountinfo/public-users");
-        }
+
     }
 }

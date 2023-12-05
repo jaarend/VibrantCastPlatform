@@ -259,6 +259,26 @@ namespace Server.Services.Organization
 
             return await _dbContext.SaveChangesAsync() == 1;
         }
+
+        public async Task<bool> UpgradeMembership(OrgMembershipUpgrade model)
+        {
+
+            if (model == null)
+                return false;
+
+            var entity = await _dbContext.Organizations.FirstOrDefaultAsync(e => e.Id == model.Id);
+
+            if (entity == null)
+                return false;
+
+            //could add a check to see if org already has membership type submitted
+
+            entity.MembershipTypeId = model.MembershipTypeId;
+
+            return await _dbContext.SaveChangesAsync() == 1;
+
+        }
+
         //DELETE
 
         public async Task<bool> DeleteOrgUserMapping(string userId)

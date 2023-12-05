@@ -16,12 +16,13 @@
 }
 
 <div class="container">
+    <p class="text-danger">Required *</p>
     <EditForm Model="@model" OnValidSubmit="@HandleSubmit">
         <DataAnnotationsValidator />
         <ValidationSummary />
 
         <div class="form-group">
-            <label>Image</label>
+            <label>Image *</label>
             <InputFile id="file" class="form-control" OnChange="OnChooseFile" />
             <div class="row">
                 <img src="@imgUrl" />

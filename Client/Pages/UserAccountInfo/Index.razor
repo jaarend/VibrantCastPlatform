@@ -142,6 +142,11 @@
                 errorMessage = $"Error: {ex.Message}";
             }
 
+            if(UserAccountInfo == null)
+            {
+                navigation.NavigateTo("/register/accountinfo");
+            }
+
         }
         else
         {

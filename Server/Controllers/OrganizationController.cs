@@ -123,7 +123,7 @@ namespace Server.Controllers
         [HttpGet("{orgId}")]
         public async Task<IActionResult> Profile(int orgId)
         {
-            if (!SetUserIdInService()) return Unauthorized();
+            //got rid of the check to see if user is logged in, this will be a public endpoint
 
             var userAccountInfo = await _organizationService.GetOrgInfoByIdAsync(orgId);
 
@@ -155,6 +155,18 @@ namespace Server.Controllers
 
             return Ok(orgEdit);
 
+        }
+
+        [HttpPut("membership-upgrade")]
+        public async Task<IActionResult> OrgMembershipUpgrade(OrgMembershipUpgrade model)
+        {
+            if (!SetUserIdInService()) return Unauthorized();
+
+            var orgEdit = await _organizationService.UpgradeMembership(model);
+
+            if(orgEdit == false) return NotFound();
+
+            return Ok(orgEdit);
         }
 
         //DELETE

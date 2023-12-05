@@ -1,0 +1,84 @@
+﻿@page "/explore"
+@using global::Shared.Models.Artwork;
+@using global::Shared.Models.UserAccountInfo;
+@inject IHttpClientFactory HttpClientFactory
+
+
+        <div class="container">
+            <!-- Hero Section -->
+            <div class="jumbotron text-center">
+                <h1 class="display-4">EXPLORE</h1>
+                <a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a>
+            </div>
+
+            <!-- Newly Uploaded Art Section -->
+            <div class="col">
+                @if (_artistWorks != null)
+                {
+                    <div class="row m-3">
+                        <h2>Your Uploaded Art</h2>
+                        @foreach (var artwork in _artistWorks)
+                        {
+                            <div class="card col-md-8 mx-auto m-3" style="width: 18rem;">
+                                <a href="@($"/artwork/{artwork.Id}")">
+                                    <img src="data:image/png;base64,@Convert.ToBase64String(artwork.FullImage)"
+                                        class="card-img-top m-2" alt="Artwork Image">
+                                </a>
+                                <div class="card-body col-md-8 mx-auto text-center">
+                                    <h5 class="card-title">@artwork.Title</h5>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p>Loading...</p>
+                }
+
+            </div>
+
+            <!-- Artists Section -->
+            <div class="col">
+                @if (_artists == null)
+                {
+                    <p><em>Loading...</em></p>
+                }
+                else
+                {
+                    <div class="row m-3">
+                        <h2>Artists in the Network</h2>
+                        <!-- Loop through your artists here -->
+                        @foreach (var artist in _artists)
+                        {
+                            var profileImg = Convert.ToBase64String(artist.ProfileImage);
+                            <div class="card col-md-8 mx-auto m-3" style="width: 18rem;">
+                                <img src="data:image/png;base64,@profileImg" alt="Artwork Image" srcset=""
+                                    class="rounded-circle mt-3">
+                                <div class="card-body col-md-8 mx-auto text-center">
+                                    <h5 class="card-title">@artist.FirstName</h5>
+                                    <a href="#" class="btn btn-primary">View Profile</a>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+
+
+
+
+@code {
+    private IEnumerable<ArtworkDetail> _artistWorks;
+    private IEnumerable<UserAccountInfoDetail> _artists;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var HttpPublic = HttpClientFactory.CreateClient("HttpPublic");
+
+        _artistWorks = await HttpPublic.GetFromJsonAsync<List<ArtworkDetail>>("api/artwork/public");
+        _artists = await HttpPublic.GetFromJsonAsync<List<UserAccountInfoDetail>>("api/profile/accountinfo/public-users");
+
+    }
+}

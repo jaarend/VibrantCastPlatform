@@ -1,16 +1,16 @@
 ﻿@page "/organizations/{Id:int}"
 @using global::Shared.Models.Organization;
 @using Microsoft.AspNetCore.Authorization;
-@attribute [Authorize]
 @inject HttpClient Http
+@inject IHttpClientFactory HttpClientFactory
 @inject NavigationManager navigation
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
-<PageTitle>Organization</PageTitle>
+<PageTitle>@OrgInfoDetail.OrganizationName</PageTitle>
 
 
 @* this should be a list of organizations *@
-<h1>Organization</h1>
+<h1>@OrgInfoDetail.OrganizationName</h1>
 
 @if (errorMessage != null)
 {
@@ -104,10 +104,11 @@
 
     protected override async Task OnInitializedAsync()
     {
+        var HttpPublic = HttpClientFactory.CreateClient("HttpPublic");
 
         try
         {
-            OrgInfoDetail = await Http.GetFromJsonAsync<OrgInfoDetail>($"/api/organization/{Id}");
+            OrgInfoDetail = await HttpPublic.GetFromJsonAsync<OrgInfoDetail>($"/api/organization/{Id}");
         }
         catch (Exception ex)
         {
