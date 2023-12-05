@@ -17,6 +17,11 @@
     <h5 class="text-danger">@errorMessage</h5>
 }
 
+@if(Message != null)
+{
+    <h2 class="text-primary">@Message</h2>
+}
+
 <a href="/organization/add-members/">Add members to your organization</a>
 <div class="container">
     <div class="card">
@@ -31,6 +36,7 @@
                 <thead>
                     <th>UserId</th>
                     <th>Is Admin?</th>
+                    <th>Actions</th>
                 </thead>
                 <tbody>
                     @foreach (var member in _members)
@@ -38,6 +44,7 @@
                         <tr>
                             <td>@member.UserId</td>
                             <td>@member?.IsAdmin</td>
+                            <td><button type="submit" class="btn btn-danger btn-block mt-5" disabled="@isLoading" @onclick="(() => DeleteUserFromOrg(member.UserId))"> Delete </button></td>
                         </tr>
                     }
                 </tbody>
@@ -58,7 +65,6 @@
 
     private readonly OrgUserMappingCreate orgUserMapping = new();
 
-    private string SelectArtistId;
 
     private IEnumerable<OrgUserMappingDetail> _members;
 
@@ -68,6 +74,8 @@
     private string errorMessage;
 
     private bool isLoading = true;
+
+    public string Message {get; set;}
 
     protected override async Task OnInitializedAsync()
     {
@@ -96,9 +104,18 @@
     }
 
 
-    private async void AddUsersToOrg()
+    private async void DeleteUserFromOrg(string userId)
     {
+        var response = await Http.DeleteAsync($"/api/organization/delete-org-user-mapping/{userId}");
 
+        if (response.IsSuccessStatusCode)
+        {
+            navigation.NavigateTo($"/organization/manage-members/");
+        }
+        else
+        {
+            Message = "Failed to delete note.";
+        }
     }
 
 }

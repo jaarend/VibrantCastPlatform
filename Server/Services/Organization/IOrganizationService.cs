@@ -23,5 +23,8 @@ namespace Server.Services.Organization
         Task<OrgInfoDetail> GetOrgInfoByIdAsync(int orgId);
 
         Task<bool> EditOrgInfoAsync(OrganizationInfoEdit model);
+
+
+        Task<bool> DeleteOrgUserMapping(string userId);
     }
 }

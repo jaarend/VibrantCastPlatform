@@ -260,5 +260,15 @@ namespace Server.Services.Organization
             return await _dbContext.SaveChangesAsync() == 1;
         }
         //DELETE
+
+        public async Task<bool> DeleteOrgUserMapping(string userId)
+        {
+            var entity = await _dbContext.OrganizationUserMapping.SingleOrDefaultAsync(e => e.UserId == userId);
+            if (entity.UserId != userId)
+                return false;
+
+            _dbContext.OrganizationUserMapping.Remove(entity);
+            return await _dbContext.SaveChangesAsync() == 1;
+        }
     }
 }
