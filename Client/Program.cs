@@ -2,6 +2,7 @@ using Client;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Microsoft.Extensions.Options;
 using VibrantCastPlatform.Client;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
@@ -12,14 +13,6 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Services.AddHttpClient("HttpPublic", client =>
 {
     client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress);
-})
-.ConfigurePrimaryHttpMessageHandler(() =>
-{
-    return new HttpClientHandler
-    {
-        UseDefaultCredentials = true,
-        AllowAutoRedirect = false
-    };
 });
 
 // Configure HttpClient for authenticated requests

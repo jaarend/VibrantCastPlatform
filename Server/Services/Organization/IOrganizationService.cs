@@ -24,6 +24,8 @@ namespace Server.Services.Organization
 
         Task<bool> EditOrgInfoAsync(OrganizationInfoEdit model);
 
+        Task<bool> UpgradeMembership(OrgMembershipUpgrade model);
+
 
         Task<bool> DeleteOrgUserMapping(string userId);
     }
