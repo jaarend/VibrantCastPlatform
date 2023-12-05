@@ -1,90 +1,60 @@
 ﻿@page "/"
 @using global::Shared.Models.Artwork;
 @using global::Shared.Models.UserAccountInfo;
+@using Microsoft.AspNetCore.Authorization;
+@attribute [Authorize]
 @inject HttpClient Http
-@inject HttpClient HttpPublic
+@inject IHttpClientFactory HttpClientFactory
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
-<div class="container">
-    <!-- Hero Section -->
-    <div class="jumbotron text-center">
-        <h1 class="display-4">Welcome to Our Art Gallery</h1>
-        <p class="lead">Explore and discover the latest artworks.</p>
-        <hr class="my-4">
-        <a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a>
+<!-- Showcase features -->
+@* could I create two views, loggedin/out for marketing then one for a user with an account*@
+    <div class="container">
+        <!-- Hero Section -->
+        <div class="jumbotron text-center">
+            <h1 class="display-4">Welcome to Our Art Gallery</h1>
+            <p class="lead">Explore and discover the latest artworks.</p>
+            <hr class="my-4">
+            <a class="btn btn-primary btn-lg" href="/explore" role="button">Explore</a>
+        </div>
     </div>
+<AuthorizeView>
+    <NotAuthorized>
+        <p>you are not logged in</p>
+    </NotAuthorized>
 
-    <!-- Newly Uploaded Art Section -->
-    <div class="col">
-        @if (_artistWorks != null && _artistWorks.Any())
-        {
-            <div class="row m-3">
-                <h2>Your Uploaded Art</h2>
-                @foreach (var artwork in _artistWorks)
-                {
-                    <div class="card col-md-8 mx-auto m-3" style="width: 18rem;">
-                        <a href="@($"/artwork/{artwork.Id}")">
-                            <img src="data:image/png;base64,@Convert.ToBase64String(artwork.FullImage)" class="card-img-top m-2"
-                                alt="Artwork Image">
-                        </a>
-                        <div class="card-body col-md-8 mx-auto text-center">
-                            <h5 class="card-title">@artwork.Title</h5>
-                        </div>
-                    </div>
-                }
-            </div>
-        }
-        else
-        {
-            <div class="row m-3">
-                <h2>Upload your first artwork!</h2>
-                <a class="btn btn-primary btn-lg" href="/artwork/create" role="button">Create</a>
-            </div>
-        }
+    <Authorized>
+        <p>check out your artwork here...</p>
+    </Authorized>
 
-    </div>
+</AuthorizeView>
 
-    <!-- Artists Section -->
-    <div class="col">
-        @if (_artists == null)
-        {
-            <p><em>Loading...</em></p>
-        }
-        else
-        {
-            <div class="row m-3">
-                <h2>Artists in the Network</h2>
-                <!-- Loop through your artists here -->
-                @foreach (var artist in _artists)
-                {
-                    var profileImg = Convert.ToBase64String(artist.ProfileImage);
-                    <div class="card col-md-8 mx-auto m-3" style="width: 18rem;">
-                        <img src="data:image/png;base64,@profileImg" alt="Artwork Image" srcset="" class="rounded-circle mt-3">
-                        <div class="card-body col-md-8 mx-auto text-center">
-                            <h5 class="card-title">@artist.FirstName</h5>
-                            <a href="#" class="btn btn-primary">View Profile</a>
-                        </div>
-                    </div>
-                }
-            </div>
-        }
-    </div>
-</div>
 
 
 @code {
+
+    //might not need anything here unless I want to show some art on the homepage
     private IEnumerable<ArtworkDetail> _artistWorks;
     private IEnumerable<UserAccountInfoDetail> _artists;
 
     protected override async Task OnInitializedAsync()
     {
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        //for use when not logged in
+
+        var HttpPublic = HttpClientFactory.CreateClient("HttpPublic");
+
+        _artistWorks = await HttpPublic.GetFromJsonAsync<List<ArtworkDetail>>("api/artwork/public");
+        _artists = await HttpPublic.GetFromJsonAsync<List<UserAccountInfoDetail>>("api/profile/accountinfo/public-users");
+
+
+
+        @* var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
 
         if (authState.User.Identity.IsAuthenticated)
         {
-            _artistWorks = await Http.GetFromJsonAsync<List<ArtworkDetail>>("api/artwork");
-            _artists = await Http.GetFromJsonAsync<List<UserAccountInfoDetail>>("api/profile/accountinfo/public-users");
-        }
+        _artistWorks = await Http.GetFromJsonAsync<List<ArtworkDetail>>("api/artwork");
+        _artists = await Http.GetFromJsonAsync<List<UserAccountInfoDetail>>("api/profile/accountinfo/public-users");
+        } *@
 
     }
 }

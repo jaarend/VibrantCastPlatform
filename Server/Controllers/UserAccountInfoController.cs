@@ -83,6 +83,17 @@ namespace Server.Controllers
             return Ok(userAccountInfo);
         }
 
+        //gets artist by artist name
+        [HttpGet("artist/{artistName}")]
+        public async Task<IActionResult> GetArtistByArtistName(string artistName)
+        {
+            var userAccountInfo = await _userAccountInfoService.GetUserAccountInfoByArtistNameAsync(artistName);
+
+            if (userAccountInfo == null) return NotFound();
+
+            return Ok(userAccountInfo);
+        }
+
         [HttpGet("public-user/{userId}")]
         public async Task<IActionResult> ArtworkDetail(string userId)
         {

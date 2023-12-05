@@ -1,0 +1,129 @@
+﻿@page "/artist/{ArtistName}"
+@using global::Shared.Models.UserAccountInfo;
+@using global::Shared.Models.User;
+@using Microsoft.AspNetCore.Authorization;
+@inject HttpClient Http
+@inject IHttpClientFactory HttpClientFactory
+@inject NavigationManager navigation
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<PageTitle>Profile</PageTitle>
+
+<h1>Profile</h1>
+
+@if (errorMessage != null)
+{
+    <h5 class="text-danger">@errorMessage</h5>
+}
+
+
+<div class="container">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between">
+            <span>Profile</span>
+        </div>
+        @if (UserAccountInfo != null)
+        {
+            var imgString = Convert.ToBase64String(UserAccountInfo.ProfileImage);
+
+            <div class="card" style="width: 18rem;">
+                <img src="data:image/png;base64,@imgString" alt="Profile Image" srcset="">
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">@UserAccountInfo.ArtistName</h4>
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">@UserAccountInfo.FirstName</h4>
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">@UserAccountInfo.LastName</h4>
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">@UserAccountInfo.Description</h4>
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">$ @UserAccountInfo.CommissionPrice</h4>
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">@UserAccountInfo.Address</h4>
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">@UserAccountInfo.City</h4>
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">@UserAccountInfo.State</h4>
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">@UserAccountInfo.Country</h4>
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">@UserAccountInfo.PostalCode</h4>
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">@UserAccountInfo.Website</h4>
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">@UserAccountInfo.Booking</h4>
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">@UserAccountInfo.Instagram</h4>
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">@UserAccountInfo.Facebook</h4>
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">@UserAccountInfo.TwitterX</h4>
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">@UserAccountInfo.LinkedIn</h4>
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">@UserAccountInfo.TikTok</h4>
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">@UserAccountInfo.SnapChat</h4>
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">@UserAccountInfo.WhatsApp</h4>
+            </div>
+        }
+    </div>
+
+
+</div>
+
+
+@code {
+
+    [Parameter]
+    public string ArtistName { get; set; }
+
+    private UserAccountInfoDetail UserAccountInfo { get; set; }
+
+    private string errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var HttpPublic = HttpClientFactory.CreateClient("HttpPublic");
+
+        try
+        {
+            //this will get artist profile info based on the artistname
+            UserAccountInfo = await HttpPublic.GetFromJsonAsync<UserAccountInfoDetail>($"/api/profile/accountinfo/artist/{ArtistName}");
+        }
+
+        catch (Exception ex)
+        {
+            errorMessage = $"Error: {ex.Message}";
+        }
+
+        if (UserAccountInfo == null)
+        {
+            errorMessage = $"Couldn't find user.";
+        }
+
+
+
+    }
+
+}

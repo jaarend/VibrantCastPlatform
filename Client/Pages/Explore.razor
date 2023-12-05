@@ -8,7 +8,7 @@
             <!-- Hero Section -->
             <div class="jumbotron text-center">
                 <h1 class="display-4">EXPLORE</h1>
-                <a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a>
+                <h3>Check out the latest art and artists!</h3>
             </div>
 
             <!-- Newly Uploaded Art Section -->
@@ -16,11 +16,11 @@
                 @if (_artistWorks != null)
                 {
                     <div class="row m-3">
-                        <h2>Your Uploaded Art</h2>
+                        <h2>Art in the network</h2>
                         @foreach (var artwork in _artistWorks)
                         {
                             <div class="card col-md-8 mx-auto m-3" style="width: 18rem;">
-                                <a href="@($"/artwork/{artwork.Id}")">
+                                <a href="@($"/artwork/public/{artwork.Id}")">
                                     <img src="data:image/png;base64,@Convert.ToBase64String(artwork.FullImage)"
                                         class="card-img-top m-2" alt="Artwork Image">
                                 </a>
@@ -49,15 +49,15 @@
                     <div class="row m-3">
                         <h2>Artists in the Network</h2>
                         <!-- Loop through your artists here -->
-                        @foreach (var artist in _artists)
+                        @foreach (var artist in _artists.Take(4))
                         {
                             var profileImg = Convert.ToBase64String(artist.ProfileImage);
-                            <div class="card col-md-8 mx-auto m-3" style="width: 18rem;">
+                            <div class="card col-md-8 mx-auto m-3" style="width: 15rem;">
                                 <img src="data:image/png;base64,@profileImg" alt="Artwork Image" srcset=""
                                     class="rounded-circle mt-3">
                                 <div class="card-body col-md-8 mx-auto text-center">
                                     <h5 class="card-title">@artist.FirstName</h5>
-                                    <a href="#" class="btn btn-primary">View Profile</a>
+                                    <a href="/artist/@artist.ArtistName" class="btn btn-primary">View Profile</a>
                                 </div>
                             </div>
                         }

@@ -138,7 +138,7 @@ namespace Server.Services.Artwork
         {
             var entity = await _dbContext
                 .Artworks
-                .FirstOrDefaultAsync(e => e.Id == artworkId && e.CreatorId == _userId);
+                .FirstOrDefaultAsync(e => e.Id == artworkId);
 
             if (entity is null)
                 return null;

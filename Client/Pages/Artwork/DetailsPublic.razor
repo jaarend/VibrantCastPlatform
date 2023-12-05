@@ -1,0 +1,207 @@
+﻿@page "/artwork/public/{Id:int}"
+@using global::Shared.Models.Artwork;
+@using global::Shared.Models.MediumTags;
+@using global::Shared.Models.Artwork.ArtworkMapping;
+@using global::Shared.Models.UserAccountInfo;
+@using Newtonsoft.Json;
+@using Microsoft.AspNetCore.Components.Forms;
+@using Microsoft.AspNetCore.Authorization;
+@using System.Text.Json.Serialization;
+@inject HttpClient Http
+@inject IHttpClientFactory HttpClientFactory
+@inject NavigationManager navigation
+
+
+@if (!isLoading)
+{
+    <div class="container justify-content-center p-0" style="width: 90%">
+        <a href="/artwork">Portfolio</a>
+        <h1 class="mt-2">@model.Title<span class="ms-3"><a href=@($"/artwork/edit/{Id}")
+                    class="btn btn-outline-primary">Edit</a></span></h1>
+        <div class="container justify-content-center p-0">
+            <div class="d-flex justify-content-center align-items-center" style="height: 100%;">
+                <img src="data:image/png;base64,@FullImageBase64" alt="Artwork Image" srcset="" class="img-fluid">
+            </div>
+            <div class="container p-0 mt-3 mb-5" style="width: 90%">
+                <p class="card-text">@model.Description</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="container justify-content-center p-3" style="width: 15rem; background-color: #ddd8d8;">
+                <div class="col d-flex gap-2">
+                    <div class="row p-2">
+                        <p class="card-title">Price</p>
+                    </div>
+                    <div class="row p-2 ms-auto text-end">
+                        <p class="card-text">$@model.Price</p>
+                    </div>
+                </div>
+                <div class="col d-flex gap-2">
+                    <div class="row p-2 ">
+                        <p class="card-title">Materials</p>
+                    </div>
+                    <div class="row p-2 ms-auto text-end">
+                        <p class="card-text">@model.Materials</p>
+                    </div>
+                </div>
+                <div class="col d-flex gap-2">
+                    <div class="row p-2 ">
+                        <p class="card-title">Mediums</p>
+                    </div>
+                    @if (tags != null)
+                    {
+                        @foreach (var tag in tags)
+                        {
+                            <p class="card-text">@tag.Name</p>
+                        }
+                    }
+                </div>
+                <div class="col d-flex gap-2">
+                    <div class="row p-2">
+                        <p class="card-title">Width</p>
+                    </div>
+                    <div class="row p-2 ms-auto text-end">
+                        <p class="card-text">@model.Width</p>
+                    </div>
+                </div>
+                <div class="col d-flex gap-2">
+                    <div class="row p-2">
+                        <p class="card-title">Height</p>
+                    </div>
+                    <div class="row p-2 ms-auto text-end">
+                        <p class="card-text">@model.Height</p>
+                    </div>
+                </div>
+            </div>
+
+            @* this will be information on the artist *@
+            @if (userDetail != null)
+            {
+                @if (errorMessage != null)
+                {
+                    <h5 class="text-danger">@errorMessage</h5>
+                }
+
+                <div class="container justify-content-center p-3" style="width: 15rem; background-color: rgb(219, 185, 217);">
+                    <div class="col d-flex gap-2">
+                        <div class="row p-2">
+                            <img src="data:image/png;base64,@ProfileImg" alt="Profile Image" srcset="">
+                        </div>
+                    </div>
+                    <div class="col d-flex gap-2">
+                        <div class="row p-2 ms-auto text-end">
+                            <p class="card-text">@userDetail.FirstName @userDetail.LastName</p>
+                        </div>
+                    </div>
+                    <div class="col d-flex gap-2">
+                        <div class="row p-2 ms-auto text-end">
+                            <p class="card-text">@userDetail.ArtistName</p>
+                        </div>
+                    </div>
+                    <div class="col d-flex gap-2">
+                        <div class="row p-2 ms-auto text-end">
+                            <p class="card-text">@userDetail.Description</p>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+    </div>
+}
+else
+{
+    <p>Loading...</p>
+}
+
+
+
+@code {
+
+    [Parameter]
+
+    public int Id { get; set; }
+    private ArtworkDetail model { get; set; } = new ArtworkDetail();
+    private UserAccountInfoDetail userDetail { get; set; } = new UserAccountInfoDetail();
+
+    private IEnumerable<MediumTagListName> tags;
+
+    private int SelectedMediumTagId;
+
+    private string? errorMessage;
+
+    private string FullImageBase64
+    {
+        get
+        {
+            if (model.FullImage != null)
+            {
+                return Convert.ToBase64String(model.FullImage);
+            }
+            else
+            {
+                return string.Empty;
+            }
+        }
+    }
+    private string ProfileImg
+    {
+        get
+        {
+            if (userDetail.ProfileImage != null)
+            {
+                return Convert.ToBase64String(userDetail.ProfileImage);
+            }
+            else
+            {
+                return string.Empty;
+            }
+        }
+    }
+
+    private bool isLoading = true;
+    protected override async Task OnInitializedAsync()
+    {
+        isLoading = false;
+
+        var HttpPublic = HttpClientFactory.CreateClient("HttpPublic");
+
+        try
+        {
+            model = await HttpPublic.GetFromJsonAsync<ArtworkDetail>($"/api/artwork/public/{Id}");
+            //gets medium tags assoicated with artwork
+            tags = await HttpPublic.GetFromJsonAsync<IEnumerable<MediumTagListName>>($"api/artwork/mediumtag/{Id}");
+
+
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error: {ex.Message}";
+        }
+
+        if (model != null)
+        {
+
+            //TODO: error: Unhandled exception rendering component: Object reference not set to an instance of an object.
+            var userId = model.CreatorId;
+
+            try
+            {
+                userDetail = await HttpPublic.GetFromJsonAsync<UserAccountInfoDetail>($"/api/profile/accountinfo/public-user/{userId}");
+            }
+
+            catch (Exception ex)
+            {
+                errorMessage = $"Error: {ex.Message}";
+            }
+
+
+        }
+
+        else
+        {
+            errorMessage = "UserID not found.";
+        }
+    }
+
+}

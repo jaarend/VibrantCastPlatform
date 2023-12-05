@@ -10,6 +10,7 @@ namespace Server.Services.UserAccountInfo
     {
         Task<bool> CreateUserAccountInfoAsync(UserAccountInfoCreate model);
         Task<UserAccountInfoDetail> GetUserAccountInfoByIdAsync(string userId);
+        Task<UserAccountInfoDetail> GetUserAccountInfoByArtistNameAsync(string artistName);
         Task<IEnumerable<UserAccountInfoDetail>> GetAllPublicUsersAsync();
         Task<bool> EditUserAccountInfoAsync(UserAccountInfoEdit model);
 
