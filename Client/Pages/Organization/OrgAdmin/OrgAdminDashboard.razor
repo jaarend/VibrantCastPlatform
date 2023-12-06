@@ -1,0 +1,114 @@
+﻿@page "/{orgName}/dashboard"
+@using global::Shared.Models.Organization;
+@using Microsoft.AspNetCore.Authorization;
+@inject HttpClient Http
+@inject IHttpClientFactory HttpClientFactory
+@inject NavigationManager navigation
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<PageTitle>@OrgInfoDetail.OrganizationName Dashboard</PageTitle>
+
+@if (errorMessage != null)
+{
+    <h5 class="text-danger">@errorMessage</h5>
+}
+
+
+<div class="container px-4 px-lg-5">
+            <h1 class="font-weight-light mb-5">@OrgInfoDetail.OrganizationName</h1>
+    <!-- Heading Row-->
+    <div class="row gx-4 gx-lg-5 align-items-center my-5 bg-secondary p-5" style="--bs-bg-opacity: 0.5;">
+        @if (OrgInfoDetail.ProfileImage != null)
+        {
+            var imgString = Convert.ToBase64String(OrgInfoDetail.ProfileImage);
+            <div class="col-lg-7" style="img-fluid rounded mb-4 mb-lg-0">
+                <img src="data:image/png;base64,@imgString" alt="Profile Image" srcset="">
+            </div>
+        }
+        <div class="col-lg-5 bg-secondary p-4">
+            <h5 class="font-weight-light text-white">@OrgInfoDetail.Address @OrgInfoDetail.City, @OrgInfoDetail.State</h5>
+            <h5 class="font-weight-light text-white">@OrgInfoDetail.Website</h5>
+            <p class="text-white">@OrgInfoDetail.Description</p>
+            <a class="btn btn-primary" href="/organization/profile/edit/{@OrgInfoDetail.Id}">Edit Profile</a>
+        </div>
+    </div>
+    <!-- Content Row-->
+    <div class="row gx-4 gx-lg-5 d-flex justify-content-center">
+        <div class="col-md-5 mb-5">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h2 class="card-title">Members</h2>
+                    <p class="card-text">You have @numberOfMembers in your organization.</p>
+                </div>
+                <div class="card-footer"><a class="btn btn-primary btn-sm" href="/@orgName/manage-members/">Manage Members</a></div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-5">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h2 class="card-title">Card Three</h2>
+                    <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Rem magni quas ex
+                        numquam, maxime minus quam molestias corporis quod, ea minima accusamus.</p>
+                </div>
+                <div class="card-footer"><a class="btn btn-primary btn-sm" href="#!">More Info</a></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+@code {
+
+    [Parameter]
+    public string orgName { get; set; }
+    public OrgInfoDetail OrgInfoDetail { get; set; } = new OrgInfoDetail();
+    public OrgUserMappingDetail OrgUserMappingDetail { get; set; } = new OrgUserMappingDetail();
+
+    private IEnumerable<OrgUserMappingDetail> _members;
+
+    public int numberOfMembers;
+
+    private string errorMessage;
+
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var userIdClaim = authState.User.FindFirst("sub");
+        isLoading = false;
+
+        if (userIdClaim != null)
+        {
+            var userId = userIdClaim.Value;
+            //get the mapping info
+            OrgUserMappingDetail = await Http.GetFromJsonAsync<OrgUserMappingDetail>($"/api/organization/checkmapping/{userId}");
+
+            //check the user's claim, if their id matches, and is admin of organization
+            if (userIdClaim != null && OrgUserMappingDetail.UserId == userId && OrgUserMappingDetail.IsAdmin == true)
+            {
+
+                //gets details if user is admin
+                OrgInfoDetail = await Http.GetFromJsonAsync<OrgInfoDetail>($"/api/organization/dashboard/{orgName}");
+
+                _members = await Http.GetFromJsonAsync<List<OrgUserMappingDetail>>($"api/organization/org-mapped-users/{OrgUserMappingDetail.OrganizationId}");
+                _members = _members.Where(user => user.IsAdmin != true).ToList();
+
+                numberOfMembers = _members.Count();
+
+            }
+            else
+            {
+                errorMessage = "You need to be the admin of this organization to add members.";
+            }
+        }
+        else
+        {
+            navigation.NavigateTo($"/");
+        }
+
+    }
+
+}

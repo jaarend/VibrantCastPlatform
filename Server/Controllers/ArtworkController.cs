@@ -80,12 +80,21 @@ namespace Server.Controllers
 
         //READ
 
+        //get all artwork owned by user
         [HttpGet]
         public async Task<List<ArtworkDetail>> Index()
         {
             if (!SetUserIdInService()) return new List<ArtworkDetail>();
 
             var artworks = await _artworkService.GetAllArtworkDetailAsync();
+
+            return artworks.ToList();
+        }
+        [HttpGet("{creatorId}/public")]
+        public async Task<List<ArtworkDetail>> ArtistProfileArtwork(string creatorId)
+        {
+
+            var artworks = await _artworkService.GetAllArtworkDetailsForPublicProfileAsync(creatorId);
 
             return artworks.ToList();
         }

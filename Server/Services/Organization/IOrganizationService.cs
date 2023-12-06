@@ -22,6 +22,8 @@ namespace Server.Services.Organization
         Task<IEnumerable<OrgInfoDetail>> GetAllOrgInfoAsync();
         Task<OrgInfoDetail> GetOrgInfoByIdAsync(int orgId);
 
+        Task<OrgInfoDetail> GetOrgInfoByOrgNameAsync(string orgName);
+
         Task<bool> EditOrgInfoAsync(OrganizationInfoEdit model);
 
         Task<bool> UpgradeMembership(OrgMembershipUpgrade model);

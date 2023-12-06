@@ -80,11 +80,41 @@ namespace Server.Services.Artwork
 
         //READ
 
+        //get all artwork by user logged in 
         public async Task<IEnumerable<ArtworkDetail>> GetAllArtworkDetailAsync()
         {
             var artworkDetails = _dbContext
                 .Artworks
                 .Where(n => n.CreatorId == _userId)
+                .Select(n =>
+                    new ArtworkDetail
+                    {
+                        Id = n.Id,
+                        Title = n.Title,
+                        FullImage = n.FullImage,
+                        Description = n.Description,
+                        Address = n.Address,
+                        City = n.City,
+                        State = n.State,
+                        Country = n.Country,
+                        PostalCode = n.PostalCode,
+                        Materials = n.Materials,
+                        Width = n.Width,
+                        Height = n.Height,
+                        Price = n.Price,
+                        DateCreated = n.DateCreated
+                    });
+
+            return await artworkDetails.ToListAsync();
+
+        }
+
+        //get all artwork for public artist profile
+        public async Task<IEnumerable<ArtworkDetail>> GetAllArtworkDetailsForPublicProfileAsync(string creatorId)
+        {
+            var artworkDetails = _dbContext
+                .Artworks
+                .Where(n => n.CreatorId == creatorId)
                 .Select(n =>
                     new ArtworkDetail
                     {
@@ -220,30 +250,5 @@ namespace Server.Services.Artwork
             _dbContext.Artworks.Remove(entity);
             return await _dbContext.SaveChangesAsync() == 1;
         }
-
-        /*
-        add the file update method
-
-        public asycn Task<bool> UpdateArtworkFile...
-        {
-            var fileName = file.FileName;
-
-            var extension = Path.GetExtension(fileName);
-
-            generate new filename to avoid duplicates
-            var newFileName = $"{Path.GetFileNameWithoutExtension(fileName)}-{Guid.NewGuid().ToString()}{extension}";
-
-            var directoryPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot","images");
-            var fullPath = Path.Combine(directoryPath, newFileName);
-
-            Directory.CreateDirectory(directoryPath);
-
-            using (var stream = new FileStream(fullPath, FileMode.Create, FileAccess.Write))
-            {
-                await file.CopyToAsync(stream);
-            }
-
-        }
-        */
     }
 }

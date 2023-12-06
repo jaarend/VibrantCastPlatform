@@ -1,14 +1,13 @@
 ﻿@page "/"
 @using global::Shared.Models.Artwork;
 @using global::Shared.Models.UserAccountInfo;
-@using Microsoft.AspNetCore.Authorization;
-@attribute [Authorize]
 @inject HttpClient Http
 @inject IHttpClientFactory HttpClientFactory
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
 <!-- Showcase features -->
-@* could I create two views, loggedin/out for marketing then one for a user with an account*@
+@* could I create two views, loggedin/out for marketing then one for a user with an account *@
+@* maybe just use an if/else statement to load two sets of html code if the user is authenticated *@
     <div class="container">
         <!-- Hero Section -->
         <div class="jumbotron text-center">
@@ -18,16 +17,7 @@
             <a class="btn btn-primary btn-lg" href="/explore" role="button">Explore</a>
         </div>
     </div>
-<AuthorizeView>
-    <NotAuthorized>
-        <p>you are not logged in</p>
-    </NotAuthorized>
 
-    <Authorized>
-        <p>check out your artwork here...</p>
-    </Authorized>
-
-</AuthorizeView>
 
 
 

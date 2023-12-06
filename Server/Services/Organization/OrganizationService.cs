@@ -125,6 +125,7 @@ namespace Server.Services.Organization
         {
             var entity = await _dbContext
                 .OrganizationUserMapping
+                .Where(e=> e.UserId == userId && e.IsAdmin == true)
                 .FirstOrDefaultAsync(e => e.UserId == userId);
 
             if (entity.IsAdmin == true)
@@ -150,6 +151,7 @@ namespace Server.Services.Organization
                 .Select(n => new OrgUserMappingDetail
                 {
                     UserId = n.UserId,
+                    OrganizationId = n.OrganizationId,
                     IsAdmin = n.IsAdmin
                 });
 
@@ -188,9 +190,40 @@ namespace Server.Services.Organization
                 WhatsApp = entity.WhatsApp,
                 DateCreated = entity.DateCreated
             };
-
             return detail;
+        }
+        public async Task<OrgInfoDetail> GetOrgInfoByOrgNameAsync(string orgName)
+        {
+            var entity = await _dbContext
+                .OrgAccountInfo
+                .FirstOrDefaultAsync(n => EF.Functions.Collate(n.OrganizationName, "SQL_Latin1_General_CP1_CI_AS") == orgName);
 
+            if (entity is null)
+                return null;
+
+            var detail = new OrgInfoDetail
+            {
+                ProfileImage = entity.ProfileImage,
+                OrganizationName = entity.OrganizationName,
+                Description = entity.Description,
+                CommissionPrice = entity.CommissionPrice,
+                Address = entity.Address,
+                City = entity.City,
+                State = entity.State,
+                Country = entity.Country,
+                PostalCode = entity.PostalCode,
+                Website = entity.Website,
+                Booking = entity.Booking,
+                Instagram = entity.Instagram,
+                Facebook = entity.Facebook,
+                TwitterX = entity.TwitterX,
+                LinkedIn = entity.LinkedIn,
+                TikTok = entity.TikTok,
+                SnapChat = entity.SnapChat,
+                WhatsApp = entity.WhatsApp,
+                DateCreated = entity.DateCreated
+            };
+            return detail;
         }
 
         public async Task<IEnumerable<OrgInfoDetail>> GetAllOrgInfoAsync()

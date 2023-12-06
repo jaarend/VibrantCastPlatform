@@ -103,6 +103,7 @@ namespace Server.Services.UserAccountInfo
 
             var detail = new UserAccountInfoDetail
             {
+                Id = userAccountInfoEntity.Id,
                 ProfileImage = userAccountInfoEntity.ProfileImage,
                 ArtistName = userAccountInfoEntity.ArtistName,
                 FirstName = userAccountInfoEntity.FirstName,
