@@ -9,18 +9,15 @@
 
 <PageTitle>Profile</PageTitle>
 
-<h1>Profile</h1>
 
 @if (MembershipType != null)
 {
     @switch (MembershipType.MembershipTypeId)
     {
         case 1:
-            <p>Free Trial</p>
-            <a href="/profile/upgrade" class="btn btn-primary">Upgrade Account</a>
+            <a href="/profile/upgrade" class="btn btn-warning m-3">Upgrade Account</a>
             break;
         case 2:
-            <p>Premium</p>
             break;
         default:
             <p>You are not a member.</p>
@@ -33,83 +30,60 @@
     <h5 class="text-danger">@errorMessage</h5>
 }
 
-<a href="/profile/accountinfo">Edit your Profile</a>
+<a href="/profile/accountinfo" class="btn btn-primary m-3">Edit your Profile</a>
+<a href="/inquiries" class="btn btn-secondary m-3">Messages</a>
 
-
-@* Add membership status *@
-<div class="container">
-    <div class="card">
-        <div class="card-header d-flex justify-content-between">
-            <span>Profile</span>
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <img src="data:image/png;base64,@FullImageBase64" class="card-img-top" alt="Profile Image">
+                <div class="card-body">
+                    <h3>@UserAccountInfo.ArtistName</h3>
+                    <p>@UserAccountInfo.Description</p>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item"><strong>Commission Price:</strong> $@UserAccountInfo.CommissionPrice
+                        </li>
+                        <li class="list-group-item"><strong>Address:</strong> @UserAccountInfo.Address</li>
+                        <li class="list-group-item"><strong>City:</strong> @UserAccountInfo.City</li>
+                        <li class="list-group-item"><strong>State:</strong> @UserAccountInfo.State</li>
+                        <li class="list-group-item"><strong>Country:</strong> @UserAccountInfo.Country</li>
+                        <li class="list-group-item"><strong>Postal Code:</strong> @UserAccountInfo.PostalCode</li>
+                    </ul>
+                </div>
+            </div>
         </div>
-        @if (UserAccountInfo != null)
-        {
-            var imgString = Convert.ToBase64String(UserAccountInfo.ProfileImage);
-
-            <div class="card" style="width: 18rem;">
-                <img src="data:image/png;base64,@imgString" alt="Profile Image" srcset="">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3>Contact Information</h3>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item"><strong>Website:</strong> <a
+                                href="@UserAccountInfo.Website">@UserAccountInfo.Website</a></li>
+                        <li class="list-group-item"><strong>Booking:</strong> @UserAccountInfo.Booking</li>
+                    </ul>
+                </div>
             </div>
-            <div class="card-body">
-                <h4 class="card-title">@UserAccountInfo.ArtistName</h4>
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3>Social Media</h3>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">Instagram: @UserAccountInfo.Instagram</li>
+                        <li class="list-group-item">Facebook: @UserAccountInfo.Facebook</li>
+                        <li class="list-group-item">Twitter: @UserAccountInfo.TwitterX</li>
+                        <li class="list-group-item">LinkedIn: @UserAccountInfo.LinkedIn</li>
+                        <li class="list-group-item">TikTok: @UserAccountInfo.TikTok</li>
+                        <li class="list-group-item">SnapChat: @UserAccountInfo.SnapChat</li>
+                        <li class="list-group-item">WhatsApp: @UserAccountInfo.WhatsApp</li>
+                    </ul>
+                </div>
             </div>
-            <div class="card-body">
-                <h4 class="card-title">@UserAccountInfo.FirstName</h4>
-            </div>
-            <div class="card-body">
-                <h4 class="card-title">@UserAccountInfo.LastName</h4>
-            </div>
-            <div class="card-body">
-                <h4 class="card-title">@UserAccountInfo.Description</h4>
-            </div>
-            <div class="card-body">
-                <h4 class="card-title">$ @UserAccountInfo.CommissionPrice</h4>
-            </div>
-            <div class="card-body">
-                <h4 class="card-title">@UserAccountInfo.Address</h4>
-            </div>
-            <div class="card-body">
-                <h4 class="card-title">@UserAccountInfo.City</h4>
-            </div>
-            <div class="card-body">
-                <h4 class="card-title">@UserAccountInfo.State</h4>
-            </div>
-            <div class="card-body">
-                <h4 class="card-title">@UserAccountInfo.Country</h4>
-            </div>
-            <div class="card-body">
-                <h4 class="card-title">@UserAccountInfo.PostalCode</h4>
-            </div>
-            <div class="card-body">
-                <h4 class="card-title">@UserAccountInfo.Website</h4>
-            </div>
-            <div class="card-body">
-                <h4 class="card-title">@UserAccountInfo.Booking</h4>
-            </div>
-            <div class="card-body">
-                <h4 class="card-title">@UserAccountInfo.Instagram</h4>
-            </div>
-            <div class="card-body">
-                <h4 class="card-title">@UserAccountInfo.Facebook</h4>
-            </div>
-            <div class="card-body">
-                <h4 class="card-title">@UserAccountInfo.TwitterX</h4>
-            </div>
-            <div class="card-body">
-                <h4 class="card-title">@UserAccountInfo.LinkedIn</h4>
-            </div>
-            <div class="card-body">
-                <h4 class="card-title">@UserAccountInfo.TikTok</h4>
-            </div>
-            <div class="card-body">
-                <h4 class="card-title">@UserAccountInfo.SnapChat</h4>
-            </div>
-            <div class="card-body">
-                <h4 class="card-title">@UserAccountInfo.WhatsApp</h4>
-            </div>
-        }
+        </div>
     </div>
-
-
 </div>
 
 
@@ -120,6 +94,21 @@
     private UserMembershipInfo MembershipType { get; set; }
 
     private string errorMessage;
+
+    private string FullImageBase64
+    {
+        get
+        {
+            if (UserAccountInfo.ProfileImage != null)
+            {
+                return Convert.ToBase64String(UserAccountInfo.ProfileImage);
+            }
+            else
+            {
+                return string.Empty;
+            }
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -142,7 +131,7 @@
                 errorMessage = $"Error: {ex.Message}";
             }
 
-            if(UserAccountInfo == null)
+            if (UserAccountInfo == null)
             {
                 navigation.NavigateTo("/register/accountinfo");
             }

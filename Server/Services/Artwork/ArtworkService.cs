@@ -69,7 +69,7 @@ namespace Server.Services.Artwork
             var artwork = _dbContext.Artworks.Find(model.ArtworksId);
             var mediumtag = _dbContext.MediumTags.Find(model.MediumTagsId);
 
-            if(artwork == null || mediumtag == null)
+            if (artwork == null || mediumtag == null)
                 return false;
 
             artwork.MediumTags.Add(mediumtag);
@@ -201,13 +201,49 @@ namespace Server.Services.Artwork
                 .Artworks
                 .Include(e => e.MediumTags)
                 .First(e => e.Id == artworkId);
-                
+
             var mediumTags = entity.MediumTags;
-            
-            return mediumTags.Select(m=> new MediumTagListName
+
+            return mediumTags.Select(m => new MediumTagListName
+            {
+                Name = m.Name,
+            });
+        }
+
+        //get all artwork from users in an org
+        public async Task<IEnumerable<ArtworkDetail>> GetAllArtworkFromMappedOrg(int orgId)
+        {
+
+            var artworkDetails = _dbContext
+                .Artworks
+                .Join(_dbContext.OrganizationUserMapping,
+                    artwork => artwork.CreatorId,
+                    mapping => mapping.UserId,
+                    (artwork, mapping) => new
+                    {
+                        artwork,
+                        mapping
+                    })
+                .Where(n => n.mapping.OrganizationId == orgId)
+                .Select(n => new ArtworkDetail
                 {
-                    Name = m.Name,
+                    Id = n.artwork.Id,
+                    Title = n.artwork.Title,
+                    FullImage = n.artwork.FullImage,
+                    Description = n.artwork.Description,
+                    Address = n.artwork.Address,
+                    City = n.artwork.City,
+                    State = n.artwork.State,
+                    Country = n.artwork.Country,
+                    PostalCode = n.artwork.PostalCode,
+                    Materials = n.artwork.Materials,
+                    Width = n.artwork.Width,
+                    Height = n.artwork.Height,
+                    Price = n.artwork.Price,
+                    DateCreated = n.artwork.DateCreated
                 });
+
+            return await artworkDetails.ToListAsync();
         }
 
         //UPDATE

@@ -4,66 +4,36 @@
 @inject IHttpClientFactory HttpClientFactory
 
 
-        <div class="container">
-            <!-- Hero Section -->
-            <div class="jumbotron text-center">
-                <h1 class="display-4">EXPLORE</h1>
-                <h3>Check out the latest art and artists!</h3>
-            </div>
+<div class="container">
+    <!-- Hero Section -->
+    <div class="jumbotron text-center">
+        <h1 class="display-4">EXPLORE</h1>
+        <h3>Check out the latest art!</h3>
+    </div>
 
-            <!-- Newly Uploaded Art Section -->
-            <div class="col">
-                @if (_artistWorks != null)
+    <div class="col">
+        @if (_artistWorks != null)
+        {
+            <div class="row g-3 art-grid">
+                @foreach (var artwork in _artistWorks)
                 {
-                    <div class="container art-grid">
-                        @foreach (var artwork in _artistWorks.OrderBy(a => Guid.NewGuid()))
-                        {
-                            <div class="art-card card mx-3 my-3">
-                                <a href="@($"/artwork/public/{artwork.Id}")">
-                                    <img src="data:image/png;base64,@Convert.ToBase64String(artwork.FullImage)"
-                                        class="card-img-top img-fluid" alt="Artwork Image">
-                                </a>
-                                <div class="card-body p-3">
-                                    <h5 class="card-title">@artwork.Title</h5>
-                                </div>
-                            </div>
-                        }
-                    </div>
-                }
-                else
-                {
-                    <p>Loading...</p>
-                }
-
-            </div>
-
-            <!-- Artists Section -->
-            <div class="col">
-                @if (_artists == null)
-                {
-                    <p><em>Loading...</em></p>
-                }
-                else
-                {
-                    <div class="row m-3">
-                        <h2>Artists in the Network</h2>
-                        <!-- Loop through your artists here -->
-                        @foreach (var artist in _artists.Take(4))
-                        {
-                            var profileImg = Convert.ToBase64String(artist.ProfileImage);
-                            <div class="card col-md-8 mx-auto m-3" style="width: 15rem;">
-                                <img src="data:image/png;base64,@profileImg" alt="Artwork Image" srcset=""
-                                    class="rounded-circle mt-3">
-                                <div class="card-body col-md-8 mx-auto text-center">
-                                    <h5 class="card-title">@artist.FirstName</h5>
-                                    <a href="/artist/@artist.ArtistName" class="btn btn-primary">View Profile</a>
-                                </div>
-                            </div>
-                        }
+                    <div class="col-lg-3 col-md-4 mb-3">
+                        <a href="@($"/artwork/public/{artwork.Id}")">
+                            <img src="data:image/png;base64,@Convert.ToBase64String(artwork.FullImage)" alt="@artwork.Title"
+                                class="img-fluid rounded artwork-image">
+                        </a>
+                        <h5 class="artwork-title">@artwork.Title</h5>
                     </div>
                 }
             </div>
-        </div>
+        }
+        else
+        {
+            <p>Loading...</p>
+        }
+
+    </div>
+</div>
 
 
 
@@ -78,6 +48,8 @@
 
         _artistWorks = await HttpPublic.GetFromJsonAsync<List<ArtworkDetail>>("api/artwork/public");
         _artists = await HttpPublic.GetFromJsonAsync<List<UserAccountInfoDetail>>("api/profile/accountinfo/public-users");
+
+        _artistWorks = _artistWorks.OrderBy(a => Guid.NewGuid()).ToList();
 
     }
 }

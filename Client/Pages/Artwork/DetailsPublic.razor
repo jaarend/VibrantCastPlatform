@@ -14,97 +14,60 @@
 
 @if (!isLoading)
 {
+
     <div class="container justify-content-center p-0" style="width: 90%">
-        <a href="/artwork">Portfolio</a>
-        <h1 class="mt-2">@model.Title<span class="ms-3"><a href=@($"/artwork/edit/{Id}")
-                    class="btn btn-outline-primary">Edit</a></span></h1>
         <div class="container justify-content-center p-0">
             <div class="d-flex justify-content-center align-items-center" style="height: 100%;">
                 <img src="data:image/png;base64,@FullImageBase64" alt="Artwork Image" srcset="" class="img-fluid">
             </div>
             <div class="container p-0 mt-3 mb-5" style="width: 90%">
-                <p class="card-text">@model.Description</p>
+                <h4 class="card-text">@model.Description</h4>
             </div>
         </div>
-        <div class="row">
-            <div class="container justify-content-center p-3" style="width: 15rem; background-color: #ddd8d8;">
-                <div class="col d-flex gap-2">
-                    <div class="row p-2">
-                        <p class="card-title">Price</p>
+        <div class="container mx-auto p-0 ">
+            <div class="col-md-8">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h2 class="d-flex align-items-center">
+                            <a href="/artist/@userDetail.ArtistName" class="stretched-link">
+                                <img src="data:image/png;base64,@ProfileImg" class="rounded-circle me-2 fit-cover"
+                                    width="40" height="40" alt="Profile Image">
+                            </a>
+                            <span class="">@userDetail.FirstName @userDetail.LastName
+                                (@userDetail.ArtistName)</span>
+                        </h2>
                     </div>
-                    <div class="row p-2 ms-auto text-end">
-                        <p class="card-text">$@model.Price</p>
-                    </div>
-                </div>
-                <div class="col d-flex gap-2">
-                    <div class="row p-2 ">
-                        <p class="card-title">Materials</p>
-                    </div>
-                    <div class="row p-2 ms-auto text-end">
-                        <p class="card-text">@model.Materials</p>
-                    </div>
-                </div>
-                <div class="col d-flex gap-2">
-                    <div class="row p-2 ">
-                        <p class="card-title">Mediums</p>
-                    </div>
-                    @if (tags != null)
-                    {
-                        @foreach (var tag in tags)
-                        {
-                            <p class="card-text">@tag.Name</p>
-                        }
-                    }
-                </div>
-                <div class="col d-flex gap-2">
-                    <div class="row p-2">
-                        <p class="card-title">Width</p>
-                    </div>
-                    <div class="row p-2 ms-auto text-end">
-                        <p class="card-text">@model.Width</p>
-                    </div>
-                </div>
-                <div class="col d-flex gap-2">
-                    <div class="row p-2">
-                        <p class="card-title">Height</p>
-                    </div>
-                    <div class="row p-2 ms-auto text-end">
-                        <p class="card-text">@model.Height</p>
+                    <div class="card-body">
+                        <p class="text-muted mb-2">@model.Description</p>
+                        <div class="row d-flex justify-content-between">
+                            <div class="col-6">
+                                <p class="card-title "><strong>Materials:</strong></p>
+                                <p class="card-text">@model.Materials</p>
+                            </div>
+                            <div class="col-6">
+                                <p class="card-title "><strong>Mediums:</strong></p>
+                                @if (tags != null)
+                                {
+                                    @foreach (var tag in tags)
+                                    {
+                                        <p class="card-text d-inline-block">@tag.Name</p>
+                                    }
+                                }
+                            </div>
+                        </div>
+                        <div class="row d-flex justify-content-between">
+                            <div class="col-6">
+                                <p class="card-title "><strong>Price:</strong></p>
+                                <p class="card-text">$@model.Price</p>
+                            </div>
+                            <div class="col-6">
+                                <p class="card-title "><strong>Dimensions:</strong></p>
+                                <p class="card-text">@model.Width (in) x @model.Height (in)</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-
-            @* this will be information on the artist *@
-            @if (userDetail != null)
-            {
-                @if (errorMessage != null)
-                {
-                    <h5 class="text-danger">@errorMessage</h5>
-                }
-
-                <div class="container justify-content-center p-3" style="width: 15rem; background-color: rgb(219, 185, 217);">
-                    <div class="col d-flex gap-2">
-                        <div class="row p-2">
-                            <img src="data:image/png;base64,@ProfileImg" alt="Profile Image" srcset="">
-                        </div>
-                    </div>
-                    <div class="col d-flex gap-2">
-                        <div class="row p-2 ms-auto text-end">
-                            <p class="card-text">@userDetail.FirstName @userDetail.LastName</p>
-                        </div>
-                    </div>
-                    <div class="col d-flex gap-2">
-                        <div class="row p-2 ms-auto text-end">
-                            <p class="card-text">@userDetail.ArtistName</p>
-                        </div>
-                    </div>
-                    <div class="col d-flex gap-2">
-                        <div class="row p-2 ms-auto text-end">
-                            <p class="card-text">@userDetail.Description</p>
-                        </div>
-                    </div>
-                </div>
-            }
         </div>
 
     </div>

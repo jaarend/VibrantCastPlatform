@@ -8,45 +8,86 @@
 @inject NavigationManager navigation
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
-<PageTitle>Profile</PageTitle>
+<PageTitle>@UserAccountInfo.ArtistName Profile</PageTitle>
 
-<h1>Profile</h1>
-
-@if (errorMessage != null)
-{
-    <h5 class="text-danger">@errorMessage</h5>
-}
-
-<div class="col-lg-12  artist-profile">
+<div class="container py-4 py-xl-5">
     <div class="row">
-        <div class="col-md-4">
-            <img src="data:image/png;base64,@Convert.ToBase64String(UserAccountInfo.ProfileImage)"
-                alt="@UserAccountInfo.ArtistName Image" class="img-fluid rounded-circle mb-3">
-            <h3 class="artist-name">@UserAccountInfo.ArtistName</h3>
-            <p class="artist-bio">@UserAccountInfo.Description</p>
-            <div class="d-flex justify-content-between align-items-center">
-                <a href="#" class="btn btn-primary">Follow</a>
-                <a href="#" class="btn btn-secondary">Contact</a>
+        <div class="col-md-6 mb-4">
+            <div class="p-xl-5 m-xl-5"><img class="rounded img-fluid w-100 fit-cover" style="min-height: 300px;" src="data:image/png;base64,@Convert.ToBase64String(UserAccountInfo.ProfileImage)" alt="@UserAccountInfo.ArtistName Image" /></div>
+        </div>
+        <div class="col-md-6 d-md-flex align-items-md-center mb-4">
+            <div style="max-width: 350px;">
+                <h2 class="text-uppercase font-weight-bold">@UserAccountInfo.ArtistName</h2>
+                <p class="my-3">@UserAccountInfo.Description</p><a class="btn btn-primary btn-lg mr-3" role="button" href="#">Message</a><a class="btn btn-outline-primary btn-lg" role="button" href="#">Website</a>
             </div>
         </div>
     </div>
-        <div class="col-lg-12">
-            <h2>Artworks by @UserAccountInfo.ArtistName</h2>
-                <div class="row art-grid">
-                    @foreach (var artwork in _artistWorks)
-                    {
-                        <div class="col-md-4 mb-3">
-                            <a href="@($"/artwork/public/{artwork.Id}")">
-                                <img src="data:image/png;base64,@Convert.ToBase64String(artwork.FullImage)"
-                                    alt="@artwork.Title" class="img-fluid rounded artwork-image">
-                            </a>
-                            <h5 class="artwork-title">@artwork.Title</h5>
-                            <p class="artwork-description">@artwork.Description</p>
-                        </div>
-                    }
-                </div>
-        </div>
 </div>
+
+
+@* <div class="artist-profile" style="background-color: #f5f5f5;">
+    <div class="row">
+        <div class="col-lg-4 col-md-6 d-flex align-items-center" >
+            <div class="profile-image-wrapper">
+                <img src="data:image/png;base64,@Convert.ToBase64String(UserAccountInfo.ProfileImage)"
+                    alt="@UserAccountInfo.ArtistName Image" class="img-fluid rounded-circle mb-3">
+            </div>
+            <div class="artist-bio ml-3">
+                <h3 class="artist-name">@UserAccountInfo.ArtistName</h3>
+                <p class="artist-bio">@UserAccountInfo.Description</p>
+                <div class="d-flex justify-content-between align-items-center">
+                    <a href="#" class="btn btn-primary">Follow</a>
+                    <a href="#" class="btn btn-secondary">Contact</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> *@
+    <h2>Artworks by @UserAccountInfo.ArtistName</h2>
+    <div class="row g-3 art-grid">
+        @foreach (var artwork in _artistWorks)
+        {
+            <div class="col-lg-4 col-md-6 mb-3">
+                <a href="@($"/artwork/public/{artwork.Id}")">
+                    <img src="data:image/png;base64,@Convert.ToBase64String(artwork.FullImage)" alt="@artwork.Title"
+                        class="img-fluid rounded artwork-image">
+                </a>
+                <h5 class="artwork-title">@artwork.Title</h5>
+            </div>
+        }
+    </div>
+
+
+@* <div class="col-lg-12 artist-profile">
+<div class="row">
+<div class="col-md-4">
+<img src="data:image/png;base64,@Convert.ToBase64String(UserAccountInfo.ProfileImage)"
+alt="@UserAccountInfo.ArtistName Image" class="img-fluid rounded-circle mb-3">
+<h3 class="artist-name">@UserAccountInfo.ArtistName</h3>
+<p class="artist-bio">@UserAccountInfo.Description</p>
+<div class="d-flex justify-content-between align-items-center">
+<a href="#" class="btn btn-primary">Follow</a>
+<a href="#" class="btn btn-secondary">Contact</a>
+</div>
+</div>
+</div>
+<div class="col-lg-12">
+<h2>Artworks by @UserAccountInfo.ArtistName</h2>
+<div class="row art-grid">
+@foreach (var artwork in _artistWorks)
+{
+<div class="col-md-4 mb-3">
+<a href="@($"/artwork/public/{artwork.Id}")">
+<img src="data:image/png;base64,@Convert.ToBase64String(artwork.FullImage)"
+alt="@artwork.Title" class="img-fluid rounded artwork-image">
+</a>
+<h5 class="artwork-title">@artwork.Title</h5>
+<p class="artwork-description">@artwork.Description</p>
+</div>
+}
+</div>
+</div>
+</div> *@
 
 
 
@@ -71,10 +112,11 @@
         try
         {
             //this will get artist profile info based on the artistname
-            UserAccountInfo = await HttpPublic.GetFromJsonAsync<UserAccountInfoDetail>($"/api/profile/accountinfo/artist/{ArtistName}");
+            UserAccountInfo = await
+            HttpPublic.GetFromJsonAsync<UserAccountInfoDetail>($"/api/profile/accountinfo/artist/{ArtistName}");
 
             creatorId = UserAccountInfo.Id;
-            
+
             //get works done by artist
             _artistWorks = await HttpPublic.GetFromJsonAsync<List<ArtworkDetail>>($"api/artwork/{creatorId}/public");
         }

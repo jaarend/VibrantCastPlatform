@@ -141,6 +141,16 @@ namespace Server.Controllers
 
         }
 
+        //get all artwork mapped to an org
+        [HttpGet("artwork-org-mapped/{orgId}")]
+        public async Task<List<ArtworkDetail>> GetArtworkFromMappedOrg(int orgId)
+        {
+            var artworks = await _artworkService.GetAllArtworkFromMappedOrg(orgId);
+
+            return artworks.ToList();
+        }
+
+
         //UPDATE
 
         [HttpPut("edit/{id}")]

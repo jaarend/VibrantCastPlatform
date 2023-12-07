@@ -8,13 +8,12 @@
 @inject HttpClient Http
 @inject NavigationManager navigation
 
-<PageTitle>Artwork Index</PageTitle>
+<PageTitle>Your Artwork</PageTitle>
 
-<h1>This will be a get to show all artwork owned by a user.</h1>
+<h2>All Your Artwork</h2>
 
 <a href="/artwork/create" class="btn btn-primary">Upload Art</a>
 
-<h3>Artworks</h3>
 
 @if (_artworks == null)
 {
@@ -45,7 +44,7 @@ else
                             var imgString = Convert.ToBase64String(artwork.FullImage);
                         }
                         <div class="card col-md-8 mx-auto m-3" style="width: 18rem;">
-                            <a href="@($"/artwork/{artwork.Id}")">
+                            <a href="@($"/artwork/public/{artwork.Id}")">
                                 <img src="data:image/png;base64,@imgString" alt="Artwork Image" srcset="" class="card-img-top">
                             </a>
                         </div>
@@ -55,8 +54,7 @@ else
                         <div class="text-center justify-content-between w-25">
                             <a href=@($"/artwork/edit/{artwork.Id}") class="btn btn-outline-primary">Edit</a>
                             @* add the delete page *@
-                            <hr />
-                            <a href="/artwork">Back to all artwork</a>
+                            <a href=@($"/artwork/delete/{artwork.Id}") class="btn btn-outline-danger">Delete</a>
                         </div>
                     </td>
                     <td>

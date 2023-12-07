@@ -147,7 +147,6 @@ namespace Server.Controllers
         [HttpGet("all")]
         public async Task<List<OrgInfoDetail>> Index()
         {
-            if (!SetUserIdInService()) return new List<OrgInfoDetail>();
 
             var orgs = await _organizationService.GetAllOrgInfoAsync();
 

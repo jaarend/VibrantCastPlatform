@@ -1,7 +1,9 @@
 ﻿@page "/community"
 @using global::Shared.Models.Artwork;
 @using global::Shared.Models.UserAccountInfo;
+@using global::Shared.Models.Organization;
 @inject IHttpClientFactory HttpClientFactory
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 
 <div class="container">
@@ -9,6 +11,11 @@
     <div class="jumbotron text-center">
         <h1 class="display-4">Community</h1>
         <h3>Our community of artists</h3>
+        @if (userId == null)
+        {
+            <a href="/register" class="btn btn-primary">Join</a>
+        }
+        <hr>
     </div>
 
 
@@ -22,21 +29,42 @@
         {
             <div class="row m-3">
                 <!-- Loop through artists here -->
-                @foreach (var artist in _artists.Take(4))
+                @foreach (var artist in _artists.Take(8))
                 {
                     var profileImg = Convert.ToBase64String(artist.ProfileImage);
-                        <div class="card col-md-8 mx-auto m-3" style="width: 15rem;">
-                            <a href="/artist/@artist.ArtistName" class="stretched-link"></a>
-                            <img src="data:image/png;base64,@profileImg" alt="Artwork Image" srcset=""
-                                class="artist-image mt-3">
-                            <div class="card-body col-md-8 mx-auto text-center">
-                                <h5 class="card-title"><strong>@artist.FirstName</strong></h5>
-                            </div>
+                    <div class="card col-md-8 mx-auto m-3" style="width: 15rem;">
+                        <a href="/artist/@artist.ArtistName" class="stretched-link"></a>
+                        <img src="data:image/png;base64,@profileImg" alt="Artwork Image" srcset="" class="artist-image mt-3">
+                        <div class="card-body col-md-8 mx-auto text-center">
+                            <h5 class="card-title"><strong>@artist.ArtistName</strong></h5>
                         </div>
+                    </div>
                 }
             </div>
         }
     </div>
+    @if (_orgDetails == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <div class="row m-3 text-center">
+            <h2>Galleries and Organizations</h2>
+            @foreach (var orgs in _orgDetails)
+            {
+                <div class="card col-md-8 mx-auto m-3" style="width: 18rem;">
+                    <a href=@($"/organizations/{orgs.Id}")>
+                        <img src="data:image/png;base64,@Convert.ToBase64String(orgs.ProfileImage)" class="card-img-top mt-2"
+                            alt="Organization Profile Image">
+                    </a>
+                    <div class="card-body col-md-8 mx-auto text-center">
+                        <h5 class="card-title"><strong>@orgs.OrganizationName</strong></h5>
+                    </div>
+                </div>
+            }
+        </div>
+    }
 </div>
 
 
@@ -45,11 +73,33 @@
 @code {
     private IEnumerable<UserAccountInfoDetail> _artists;
 
+    private IEnumerable<OrgInfoDetail> _orgDetails;
+
+    private string? userId;
+
     protected override async Task OnInitializedAsync()
     {
+
         var HttpPublic = HttpClientFactory.CreateClient("HttpPublic");
 
         _artists = await HttpPublic.GetFromJsonAsync<List<UserAccountInfoDetail>>("api/profile/accountinfo/public-users");
 
+        _orgDetails = await HttpPublic.GetFromJsonAsync<List<OrgInfoDetail>>($"/api/organization/all");
+
+        _artists = _artists.OrderBy(a => Guid.NewGuid()).ToList();
+
+        _orgDetails = _orgDetails.OrderBy(a => Guid.NewGuid()).ToList();
+
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var userIdClaim = authState.User.FindFirst("sub");
+
+        if (userIdClaim != null)
+        {
+            userId = userIdClaim.Value;
+        }
+        else
+        {
+            userId = null;
+        }
     }
 }
