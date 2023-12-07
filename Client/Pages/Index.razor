@@ -1,13 +1,11 @@
 ﻿@page "/"
 @using global::Shared.Models.Artwork;
 @using global::Shared.Models.UserAccountInfo;
+@using global::Shared.Models.Organization;
 @inject HttpClient Http
 @inject IHttpClientFactory HttpClientFactory
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
-<!-- Showcase features -->
-@* could I create two views, loggedin/out for marketing then one for a user with an account *@
-@* maybe just use an if/else statement to load two sets of html code if the user is authenticated *@
 <div class="container">
     <!-- Hero Section -->
     <div class="jumbotron text-center">
@@ -19,7 +17,6 @@
 </div>
 
 <div class="col m-5">
-    <h5>Latest Artwork</h5>
     @if (_artistWorks != null)
     {
         <div class="row g-3 art-grid">
@@ -40,6 +37,29 @@
         <p>Loading...</p>
     }
 
+    @if (_orgDetails == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <div class="row m-3 text-center">
+            <h2>Galleries and Organizations</h2>
+            @foreach (var orgs in _orgDetails)
+            {
+                <div class="card col-md-8 mx-auto m-3" style="width: 18rem;">
+                    <a href=@($"/organizations/{orgs.Id}")>
+                        <img src="data:image/png;base64,@Convert.ToBase64String(orgs.ProfileImage)" class="card-img-top mt-2"
+                            alt="Organization Profile Image">
+                    </a>
+                    <div class="card-body col-md-8 mx-auto text-center">
+                        <h5 class="card-title"><strong>@orgs.OrganizationName</strong></h5>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
 </div>
 
 
@@ -49,7 +69,7 @@
 
     //might not need anything here unless I want to show some art on the homepage
     private IEnumerable<ArtworkDetail> _artistWorks;
-    private IEnumerable<UserAccountInfoDetail> _artists;
+    private IEnumerable<OrgInfoDetail> _orgDetails;
 
     protected override async Task OnInitializedAsync()
     {
@@ -60,8 +80,8 @@
         _artistWorks = await HttpPublic.GetFromJsonAsync<List<ArtworkDetail>>("api/artwork/public");
         _artistWorks = _artistWorks.OrderBy(a => Guid.NewGuid()).ToList();
 
-        _artists = await HttpPublic.GetFromJsonAsync<List<UserAccountInfoDetail>>("api/profile/accountinfo/public-users");
-
+        _orgDetails = await HttpPublic.GetFromJsonAsync<List<OrgInfoDetail>>($"/api/organization/all");
+        _orgDetails = _orgDetails.OrderBy(a => Guid.NewGuid()).ToList();
 
     }
 }
