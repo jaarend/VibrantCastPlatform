@@ -6,8 +6,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Shared.Models.Artwork;
+using Shared.Models.Artwork.ArtworkMapping;
 using VibrantCastPlatform.Server.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Shared.Models.MediumTags;
 
 namespace Server.Services.Artwork
 {
@@ -26,34 +30,57 @@ namespace Server.Services.Artwork
         //CREATE
         public void SetUserId(string userId) => _userId = userId;
 
-        public async Task<bool> CreateArtworkMetaDataAsync(ArtworkCreate model)
+        public async Task<bool> CreateArtworkAsync(ArtworkCreate model)
         {
-
-            var artworkEntity = new Models.Artwork
+            try
             {
-                CreatorId = _userId,
-                FullImage = "",
-                Title = model.Title,
-                Description = model.Description,
-                Address = model.Address,
-                City = model.City,
-                State = model.State,
-                Country = model.Country,
-                PostalCode = model.PostalCode,
-                Materials = model.Materials,
-                Width = model.Width,
-                Height = model.Height,
-                Price = model.Price,
-                DateCreated = DateTime.Now
-            };
+                var artworkEntity = new Models.Artwork
+                {
+                    CreatorId = _userId,
+                    FullImage = model.FullImage,
+                    Title = model.Title,
+                    Description = model.Description,
+                    Address = model.Address,
+                    City = model.City,
+                    State = model.State,
+                    Country = model.Country,
+                    PostalCode = model.PostalCode,
+                    Materials = model.Materials,
+                    Width = model.Width,
+                    Height = model.Height,
+                    Price = model.Price,
+                    DateCreated = DateTime.Now
+                };
 
-            _dbContext.Artworks.Add(artworkEntity);
-            var numberOfChanges = await _dbContext.SaveChangesAsync();
-            return numberOfChanges == 1;
+                _dbContext.Artworks.Add(artworkEntity);
+
+                var numberOfChanges = await _dbContext.SaveChangesAsync();
+                return numberOfChanges == 1;
+            }
+            catch
+            {
+                return false;
+            }
         }
+
+        //create ArtworkMediumTagMapping
+        public async Task<bool> AddMediumTagToArtwork(ArtworkMediumTagMapping model)
+        {
+            var artwork = _dbContext.Artworks.Find(model.ArtworksId);
+            var mediumtag = _dbContext.MediumTags.Find(model.MediumTagsId);
+
+            if (artwork == null || mediumtag == null)
+                return false;
+
+            artwork.MediumTags.Add(mediumtag);
+
+            return await _dbContext.SaveChangesAsync() == 1;
+        }
+
 
         //READ
 
+        //get all artwork by user logged in 
         public async Task<IEnumerable<ArtworkDetail>> GetAllArtworkDetailAsync()
         {
             var artworkDetails = _dbContext
@@ -62,12 +89,14 @@ namespace Server.Services.Artwork
                 .Select(n =>
                     new ArtworkDetail
                     {
+                        Id = n.Id,
                         Title = n.Title,
+                        FullImage = n.FullImage,
                         Description = n.Description,
                         Address = n.Address,
                         City = n.City,
                         State = n.State,
-                        Country =n.Country,
+                        Country = n.Country,
                         PostalCode = n.PostalCode,
                         Materials = n.Materials,
                         Width = n.Width,
@@ -75,8 +104,63 @@ namespace Server.Services.Artwork
                         Price = n.Price,
                         DateCreated = n.DateCreated
                     });
-                
-                return await artworkDetails.ToListAsync();
+
+            return await artworkDetails.ToListAsync();
+
+        }
+
+        //get all artwork for public artist profile
+        public async Task<IEnumerable<ArtworkDetail>> GetAllArtworkDetailsForPublicProfileAsync(string creatorId)
+        {
+            var artworkDetails = _dbContext
+                .Artworks
+                .Where(n => n.CreatorId == creatorId)
+                .Select(n =>
+                    new ArtworkDetail
+                    {
+                        Id = n.Id,
+                        Title = n.Title,
+                        FullImage = n.FullImage,
+                        Description = n.Description,
+                        Address = n.Address,
+                        City = n.City,
+                        State = n.State,
+                        Country = n.Country,
+                        PostalCode = n.PostalCode,
+                        Materials = n.Materials,
+                        Width = n.Width,
+                        Height = n.Height,
+                        Price = n.Price,
+                        DateCreated = n.DateCreated
+                    });
+
+            return await artworkDetails.ToListAsync();
+
+        }
+        public async Task<IEnumerable<ArtworkDetail>> GetAllPublicArtworkDetailAsync() //could change this to return new art first...
+        {
+            var artworkDetails = _dbContext
+                .Artworks
+                .Select(n =>
+                    new ArtworkDetail
+                    {
+                        Id = n.Id,
+                        Title = n.Title,
+                        FullImage = n.FullImage,
+                        Description = n.Description,
+                        Address = n.Address,
+                        City = n.City,
+                        State = n.State,
+                        Country = n.Country,
+                        PostalCode = n.PostalCode,
+                        Materials = n.Materials,
+                        Width = n.Width,
+                        Height = n.Height,
+                        Price = n.Price,
+                        DateCreated = n.DateCreated
+                    });
+
+            return await artworkDetails.ToListAsync();
 
         }
 
@@ -84,14 +168,17 @@ namespace Server.Services.Artwork
         {
             var entity = await _dbContext
                 .Artworks
-                .FirstOrDefaultAsync(e => e.Id == artworkId && e.CreatorId == _userId);
+                .FirstOrDefaultAsync(e => e.Id == artworkId);
 
-            if(entity is null)
+            if (entity is null)
                 return null;
-            
+
             var detail = new ArtworkDetail
             {
+                Id = entity.Id,
+                CreatorId = entity.CreatorId,
                 Title = entity.Title,
+                FullImage = entity.FullImage,
                 Description = entity.Description,
                 Address = entity.Address,
                 City = entity.City,
@@ -105,21 +192,73 @@ namespace Server.Services.Artwork
             };
 
             return detail;
-            
+
+        }
+
+        public async Task<IEnumerable<MediumTagListName>> GetAllMediumTagsOnArt(int artworkId)
+        {
+            var entity = _dbContext
+                .Artworks
+                .Include(e => e.MediumTags)
+                .First(e => e.Id == artworkId);
+
+            var mediumTags = entity.MediumTags;
+
+            return mediumTags.Select(m => new MediumTagListName
+            {
+                Name = m.Name,
+            });
+        }
+
+        //get all artwork from users in an org
+        public async Task<IEnumerable<ArtworkDetail>> GetAllArtworkFromMappedOrg(int orgId)
+        {
+
+            var artworkDetails = _dbContext
+                .Artworks
+                .Join(_dbContext.OrganizationUserMapping,
+                    artwork => artwork.CreatorId,
+                    mapping => mapping.UserId,
+                    (artwork, mapping) => new
+                    {
+                        artwork,
+                        mapping
+                    })
+                .Where(n => n.mapping.OrganizationId == orgId)
+                .Select(n => new ArtworkDetail
+                {
+                    Id = n.artwork.Id,
+                    Title = n.artwork.Title,
+                    FullImage = n.artwork.FullImage,
+                    Description = n.artwork.Description,
+                    Address = n.artwork.Address,
+                    City = n.artwork.City,
+                    State = n.artwork.State,
+                    Country = n.artwork.Country,
+                    PostalCode = n.artwork.PostalCode,
+                    Materials = n.artwork.Materials,
+                    Width = n.artwork.Width,
+                    Height = n.artwork.Height,
+                    Price = n.artwork.Price,
+                    DateCreated = n.artwork.DateCreated
+                });
+
+            return await artworkDetails.ToListAsync();
         }
 
         //UPDATE
 
-        public async Task<bool> UpdateArtworkMetaData(ArtworkUpdate model)
+        public async Task<bool> UpdateArtwork(ArtworkUpdate model)
         {
-            if(model == null)
+            if (model == null)
                 return false;
 
             var entity = await _dbContext.Artworks.FindAsync(model.Id);
 
-            if(entity?.CreatorId != _userId) return false;
+            if (entity?.CreatorId != _userId) return false;
 
             entity.Title = model.Title;
+            entity.FullImage = model.FullImage;
             entity.Description = model.Description;
             entity.Address = model.Address;
             entity.City = model.City;
@@ -141,36 +280,11 @@ namespace Server.Services.Artwork
         public async Task<bool> DeleteArtworkAsync(int artworkId)
         {
             var entity = await _dbContext.Artworks.FindAsync(artworkId);
-            if(entity.CreatorId != _userId)
+            if (entity.CreatorId != _userId)
                 return false;
-            
+
             _dbContext.Artworks.Remove(entity);
             return await _dbContext.SaveChangesAsync() == 1;
         }
-
-        /*
-        add the file update method
-
-        public asycn Task<bool> UpdateArtworkFile...
-        {
-            var fileName = file.FileName;
-
-            var extension = Path.GetExtension(fileName);
-
-            generate new filename to avoid duplicates
-            var newFileName = $"{Path.GetFileNameWithoutExtension(fileName)}-{Guid.NewGuid().ToString()}{extension}";
-
-            var directoryPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot","images");
-            var fullPath = Path.Combine(directoryPath, newFileName);
-
-            Directory.CreateDirectory(directoryPath);
-
-            using (var stream = new FileStream(fullPath, FileMode.Create, FileAccess.Write))
-            {
-                await file.CopyToAsync(stream);
-            }
-
-        }
-        */
     }
 }

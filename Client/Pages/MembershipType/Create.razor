@@ -1,0 +1,65 @@
+@page "/memberships/create"
+@using global::Shared.Models.MembershipType;
+@using Microsoft.AspNetCore.Authorization;
+@attribute [Authorize]
+@inject HttpClient Http
+@inject NavigationManager navigation
+
+<PageTitle>Membership Types</PageTitle>
+
+<h1>Membership Types</h1>
+
+@if(errorMessage != null)
+{
+    <h5 class="text-danger">@errorMessage</h5>
+}
+
+<div class="container">
+    <EditForm Model="@model" OnValidSubmit="@HandleSubmit">
+        <DataAnnotationsValidator/>
+        <ValidationSummary/>
+
+        <div class="form-group">
+            <label>Name</label>
+            <InputText class="form-control" @bind-Value="model.Name"/>
+            <label>Description</label>
+            <InputText class="form-control" @bind-Value="model.Description"/>
+            <label>Monthly Price</label>
+            <InputNumber class="form-control" @bind-Value="model.MonthlyAmount"/>
+            <label>Yearly Price</label>
+            <InputNumber class="form-control" @bind-Value="model.YearlyAmount"/>
+            <label>Artwork Limit</label>
+            <InputNumber class="form-control" @bind-Value="model.ArtworkLimit"/>
+            <label>Experiences Limit</label>
+            <InputNumber class="form-control" @bind-Value="model.ExperiencesLimit"/>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block mt-5"> Submit </button>
+    </EditForm>
+
+
+</div>
+
+
+@code {
+
+    private readonly MembershipTypeCreate model = new();
+
+    private string errorMessage;
+
+    private async void HandleSubmit()
+    {
+        model.DateCreated = DateTime.Now;
+
+        var createResponse = await Http.PostAsJsonAsync<MembershipTypeCreate>("api/membershiptype/create", model);
+
+        if(createResponse.IsSuccessStatusCode)
+        {
+            navigation.NavigateTo("/memberships");
+        }
+        else
+        {
+            errorMessage = "Could not create membership type right now. Please try again.";
+        }
+    }
+
+}

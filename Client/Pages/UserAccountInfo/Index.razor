@@ -1,0 +1,147 @@
+﻿@page "/profile"
+@using global::Shared.Models.UserAccountInfo;
+@using global::Shared.Models.User;
+@using Microsoft.AspNetCore.Authorization;
+@attribute [Authorize]
+@inject HttpClient Http
+@inject NavigationManager navigation
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<PageTitle>Profile</PageTitle>
+
+
+@if (MembershipType != null)
+{
+    @switch (MembershipType.MembershipTypeId)
+    {
+        case 1:
+            <a href="/profile/upgrade" class="btn btn-warning m-3">Upgrade Account</a>
+            break;
+        case 2:
+            break;
+        default:
+            <p>You are not a member.</p>
+            break;
+    }
+}
+
+@if (errorMessage != null)
+{
+    <h5 class="text-danger">@errorMessage</h5>
+}
+
+<a href="/profile/accountinfo" class="btn btn-primary m-3">Edit your Profile</a>
+<a href="/inquiries" class="btn btn-secondary m-3">Messages</a>
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <img src="data:image/png;base64,@FullImageBase64" class="card-img-top" alt="Profile Image">
+                <div class="card-body">
+                    <h3>@UserAccountInfo.ArtistName</h3>
+                    <p>@UserAccountInfo.Description</p>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item"><strong>Commission Price:</strong> $@UserAccountInfo.CommissionPrice
+                        </li>
+                        <li class="list-group-item"><strong>Address:</strong> @UserAccountInfo.Address</li>
+                        <li class="list-group-item"><strong>City:</strong> @UserAccountInfo.City</li>
+                        <li class="list-group-item"><strong>State:</strong> @UserAccountInfo.State</li>
+                        <li class="list-group-item"><strong>Country:</strong> @UserAccountInfo.Country</li>
+                        <li class="list-group-item"><strong>Postal Code:</strong> @UserAccountInfo.PostalCode</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3>Contact Information</h3>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item"><strong>Website:</strong> <a
+                                href="@UserAccountInfo.Website">@UserAccountInfo.Website</a></li>
+                        <li class="list-group-item"><strong>Booking:</strong> @UserAccountInfo.Booking</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3>Social Media</h3>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">Instagram: @UserAccountInfo.Instagram</li>
+                        <li class="list-group-item">Facebook: @UserAccountInfo.Facebook</li>
+                        <li class="list-group-item">Twitter: @UserAccountInfo.TwitterX</li>
+                        <li class="list-group-item">LinkedIn: @UserAccountInfo.LinkedIn</li>
+                        <li class="list-group-item">TikTok: @UserAccountInfo.TikTok</li>
+                        <li class="list-group-item">SnapChat: @UserAccountInfo.SnapChat</li>
+                        <li class="list-group-item">WhatsApp: @UserAccountInfo.WhatsApp</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@code {
+
+    private UserAccountInfoDetail UserAccountInfo { get; set; }
+
+    private UserMembershipInfo MembershipType { get; set; }
+
+    private string errorMessage;
+
+    private string FullImageBase64
+    {
+        get
+        {
+            if (UserAccountInfo.ProfileImage != null)
+            {
+                return Convert.ToBase64String(UserAccountInfo.ProfileImage);
+            }
+            else
+            {
+                return string.Empty;
+            }
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var userIdClaim = authState.User.FindFirst("sub");
+
+        if (userIdClaim != null && !string.IsNullOrEmpty(userIdClaim.Value))
+        {
+            var userId = userIdClaim.Value;
+
+            try
+            {
+                UserAccountInfo = await Http.GetFromJsonAsync<UserAccountInfoDetail>($"/api/profile/accountinfo/{userId}");
+
+                MembershipType = await Http.GetFromJsonAsync<UserMembershipInfo>($"api/profile/accountinfo/membership-status/{userId}");
+            }
+
+            catch (Exception ex)
+            {
+                errorMessage = $"Error: {ex.Message}";
+            }
+
+            if (UserAccountInfo == null)
+            {
+                navigation.NavigateTo("/register/accountinfo");
+            }
+
+        }
+        else
+        {
+            errorMessage = "UserID not found. You need to be logged in to see your profile.";
+        }
+
+    }
+
+}

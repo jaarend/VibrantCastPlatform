@@ -9,7 +9,7 @@ public class ApplicationUser : IdentityUser
 {
    
     [ForeignKey("MembershipType")]
-    public int? MembershipTypeId { get; set; } //when users sign up their membership is null, which acts as a free account
+    public int? MembershipTypeId { get; set; }  = 1; //set to 1 as the default free account
     public virtual MembershipType? MembershipType {get; set;}
 
     public virtual UserAccountInfo? UserAccountInfo {get; set;}

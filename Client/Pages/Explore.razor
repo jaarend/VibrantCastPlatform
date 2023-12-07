@@ -1,0 +1,55 @@
+﻿@page "/explore"
+@using global::Shared.Models.Artwork;
+@using global::Shared.Models.UserAccountInfo;
+@inject IHttpClientFactory HttpClientFactory
+
+
+<div class="container">
+    <!-- Hero Section -->
+    <div class="jumbotron text-center">
+        <h1 class="display-4">EXPLORE</h1>
+        <h3>Check out the latest art!</h3>
+    </div>
+
+    <div class="col">
+        @if (_artistWorks != null)
+        {
+            <div class="row g-3 art-grid">
+                @foreach (var artwork in _artistWorks)
+                {
+                    <div class="col-lg-3 col-md-4 mb-3">
+                        <a href="@($"/artwork/public/{artwork.Id}")">
+                            <img src="data:image/png;base64,@Convert.ToBase64String(artwork.FullImage)" alt="@artwork.Title"
+                                class="img-fluid rounded artwork-image">
+                        </a>
+                        <h5 class="artwork-title">@artwork.Title</h5>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <p>Loading...</p>
+        }
+
+    </div>
+</div>
+
+
+
+
+@code {
+    private IEnumerable<ArtworkDetail> _artistWorks;
+    private IEnumerable<UserAccountInfoDetail> _artists;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var HttpPublic = HttpClientFactory.CreateClient("HttpPublic");
+
+        _artistWorks = await HttpPublic.GetFromJsonAsync<List<ArtworkDetail>>("api/artwork/public");
+        _artists = await HttpPublic.GetFromJsonAsync<List<UserAccountInfoDetail>>("api/profile/accountinfo/public-users");
+
+        _artistWorks = _artistWorks.OrderBy(a => Guid.NewGuid()).ToList();
+
+    }
+}

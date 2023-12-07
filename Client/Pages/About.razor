@@ -1,0 +1,77 @@
+﻿@page "/about"
+@using global::Shared.Models.Artwork;
+@using global::Shared.Models.UserAccountInfo;
+@using global::Shared.Models.Organization;
+@inject HttpClient Http
+@inject IHttpClientFactory HttpClientFactory
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+
+<div class="container">
+    <section>
+        <h1>
+            <span>About Us</span>
+        </h1>
+        <p>
+            Welcome to VibrantCast, a family-owned and operated business dedicated to supporting and promoting local
+            artists in Chicago and beyond. Our founders, Steve and Elva Arend, have a rich heritage of creativity,
+            surrounded by inventors, actors, photographers, and artists. With their shared passion for the arts and a
+            family full of creatives, it was only natural for them to establish a business that would work closely with
+            artists.
+        </p>
+        <p>
+            At VibrantCast, we are committed to creating a vibrant community of artists and art enthusiasts who value
+            creativity and self-expression. Our Vibrant Artist Network serves as a virtual hub, connecting artists from
+            around the world, while also providing a physical studio space. We aim to explore new frontiers where
+            technology meets creativity in new immersive and augmented reality
+            experiences.
+        </p>
+        <p>
+            We believe in the power of personal connections, so our network also fosters in-person meetings for local
+            artists. Sharing stories and best practices allows artists to build strong bonds and a sense of community.
+            In today's fast-paced world, we understand that a nurturing and supportive community is something we all
+            crave, even if we don't realize it.
+        </p>
+        <p>
+            At VibrantCast, we are not only passionate about supporting established artists but also dedicated to
+            helping people discover emerging artists. Our platform serves as a gateway for art enthusiasts to explore
+            and connect with talented artists who are on the rise. We take pride in offering the work of both
+            established and emerging artists, creating an inclusive and diverse space for artistic exploration.
+        </p>
+        <p>
+            The name "VibrantCast" is derived from our mission to elevate the world's energy with vibrancy through the
+            power of creativity expressed through all types of art. Our goal is to infuse the world with the energy and
+            vitality that art brings.
+        </p>
+        <p>
+            Join us today to support local artists and become an integral part of our vibrant community! Together, we
+            can celebrate the beauty and inspiration that art brings to our lives while discovering and nurturing the
+            next generation of creative talents.
+        </p>
+    </section>
+
+</div>
+
+
+
+
+@code {
+
+    //might not need anything here unless I want to show some art on the homepage
+    private IEnumerable<ArtworkDetail> _artistWorks;
+    private IEnumerable<OrgInfoDetail> _orgDetails;
+
+    protected override async Task OnInitializedAsync()
+    {
+        //for use when not logged in
+
+        var HttpPublic = HttpClientFactory.CreateClient("HttpPublic");
+
+        _artistWorks = await HttpPublic.GetFromJsonAsync<List<ArtworkDetail>>("api/artwork/public");
+        _artistWorks = _artistWorks.OrderBy(a => Guid.NewGuid()).ToList();
+
+        _orgDetails = await HttpPublic.GetFromJsonAsync<List<OrgInfoDetail>>($"/api/organization/all");
+        _orgDetails = _orgDetails.OrderBy(a => Guid.NewGuid()).ToList();
+
+    }
+}

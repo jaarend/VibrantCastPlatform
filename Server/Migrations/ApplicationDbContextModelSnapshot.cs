@@ -383,9 +383,9 @@ namespace VibrantCastPlatform.Server.Migrations
                         .HasMaxLength(2000)
                         .HasColumnType("nvarchar(2000)");
 
-                    b.Property<string>("FullImage")
+                    b.Property<byte[]>("FullImage")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varbinary(max)");
 
                     b.Property<string>("Height")
                         .IsRequired()
@@ -545,6 +545,110 @@ namespace VibrantCastPlatform.Server.Migrations
                     b.ToTable("ExperienceTypes");
                 });
 
+            modelBuilder.Entity("Server.Models.Inquiry", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("ArtworkId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTimeOffset?>("DateOpened")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FromUserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("InteractionId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("ToUserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UsersId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ArtworkId");
+
+                    b.HasIndex("UsersId");
+
+                    b.ToTable("Inquiries");
+                });
+
+            modelBuilder.Entity("Server.Models.Interaction", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ArtworkId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ExperiencesId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("InteractionType")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Interactions");
+                });
+
+            modelBuilder.Entity("Server.Models.InteractionType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTimeOffset>("DateModified")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("InteractionTypes");
+                });
+
             modelBuilder.Entity("Server.Models.MediumTag", b =>
                 {
                     b.Property<int>("Id")
@@ -676,9 +780,9 @@ namespace VibrantCastPlatform.Server.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("ProfileImage")
+                    b.Property<byte[]>("ProfileImage")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varbinary(max)");
 
                     b.Property<string>("SnapChat")
                         .IsRequired()
@@ -842,9 +946,9 @@ namespace VibrantCastPlatform.Server.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("ProfileImage")
+                    b.Property<byte[]>("ProfileImage")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varbinary(max)");
 
                     b.Property<string>("SnapChat")
                         .IsRequired()
@@ -1088,6 +1192,21 @@ namespace VibrantCastPlatform.Server.Migrations
                         .IsRequired();
 
                     b.Navigation("ExperienceType");
+                });
+
+            modelBuilder.Entity("Server.Models.Inquiry", b =>
+                {
+                    b.HasOne("Server.Models.Artwork", "Artwork")
+                        .WithMany()
+                        .HasForeignKey("ArtworkId");
+
+                    b.HasOne("VibrantCastPlatform.Server.Models.ApplicationUser", "Users")
+                        .WithMany()
+                        .HasForeignKey("UsersId");
+
+                    b.Navigation("Artwork");
+
+                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("Server.Models.OrgAccountInfo", b =>

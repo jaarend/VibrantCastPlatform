@@ -1,5 +1,7 @@
 ﻿@page "/artwork/edit/{Id:int}"
 @using global::Shared.Models.Artwork;
+@using global::Shared.Models.Artwork.ArtworkMapping;
+@using global::Shared.Models.MediumTags;
 @using Newtonsoft.Json;
 @using Microsoft.AspNetCore.Components.Forms;
 @using Microsoft.AspNetCore.Authorization;
@@ -8,84 +10,99 @@
 @inject HttpClient Http
 @inject NavigationManager navigation
 
-<PageTitle>upload new Artwork</PageTitle>
+<PageTitle>Edit Artwork</PageTitle>
 
-<h1>Update Account Information</h1>
+<h1>Edit Artwork</h1>
 
 @if (errorMessage != null)
 {
     <h5 class="text-danger">@errorMessage</h5>
 }
 
-@if(!isLoading)
+@if (!isLoading)
 {
 
-<div class="container">
-    <EditForm Model="@model" OnValidSubmit="@HandleSubmit">
-        <DataAnnotationsValidator />
-        <ValidationSummary />
+    <div class="container">
+        <EditForm Model="@model" OnValidSubmit="@HandleSubmit">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <div class="form-group">
+                <div class="card" style="width: 18rem;">
+                    <img src="data:image/png;base64,@FullImageBase64" alt=" Artwork Image" srcset="">
+                    <div class="card-body">
+                        <p class="card-text">Change your artwork image</p>
+                        <InputFile id="file" class="form-control" OnChange="OnChooseFile" />
+                        <div class="row">
+                            <img src="@imgUrl" />
+                        </div>
+                        <div class="form-group">
+                            <ValidationMessage For="@(() => model.FullImage)" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Title</label>
+                <InputText class="form-control" @bind-Value="model.Title" />
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <InputText class="form-control" @bind-Value="model.Description" />
+            </div>
+            <div class="form-group">
+                <label>Mediums</label>
+                <InputSelect class="form-control" @bind-Value="SelectedMediumTagId">
+                    @if (tags != null)
+                    {
+                        @foreach (var _tag in tags)
+                        {
+                            <option value="@_tag.Id">@_tag.Name</option>
+                        }
+                    }
+                </InputSelect>
+            </div>
+            <div class="form-group">
+                <label>Address</label>
+                <InputText class="form-control" @bind-Value="model.Address" />
+            </div>
+            <div class="form-group">
+                <label>City</label>
+                <InputText class="form-control" @bind-Value="model.City" />
+            </div>
+            <div class="form-group">
+                <label>State</label>
+                <InputText class="form-control" @bind-Value="model.State" />
+            </div>
+            <div class="form-group">
+                <label>Country</label>
+                <InputText class="form-control" @bind-Value="model.Country" />
+            </div>
+            <div class="form-group">
+                <label>Postal Code</label>
+                <InputText class="form-control" @bind-Value="model.PostalCode" />
+            </div>
+            <div class="form-group">
+                <label>Materials</label>
+                <InputText class="form-control" @bind-Value="model.Materials" />
+            </div>
+            <div class="form-group">
+                <label>Width</label>
+                <InputText class="form-control" @bind-Value="model.Width" />
+            </div>
+            <div class="form-group">
+                <label>Height</label>
+                <InputText class="form-control" @bind-Value="model.Height" />
+            </div>
+            <div class="form-group">
+                <label>Price</label>
+                <InputNumber class="form-control" @bind-Value="model.Price" />
+            </div>
 
-        @* <div class="form-group">
-            <label>Image</label>
-            <InputFile id="file" class="form-control" OnChange="OnChooseFile" />
-        </div>
-        <div class="row">
-            <img src="@imgUrl" />
-        </div>
-        <div class="form-group">
-            <ValidationMessage For="@(() => model.FullImage)" />
-        </div> *@
-
-        <div class="form-group">
-            <label>Title</label>
-            <InputText class="form-control" @bind-Value="model.Title" />
-        </div>
-        <div class="form-group">
-            <label>Description</label>
-            <InputText class="form-control" @bind-Value="model.Description" />
-        </div>
-        <div class="form-group">
-            <label>Address</label>
-            <InputText class="form-control" @bind-Value="model.Address" />
-        </div>
-        <div class="form-group">
-            <label>City</label>
-            <InputText class="form-control" @bind-Value="model.City" />
-        </div>
-        <div class="form-group">
-            <label>State</label>
-            <InputText class="form-control" @bind-Value="model.State" />
-        </div>
-        <div class="form-group">
-            <label>Country</label>
-            <InputText class="form-control" @bind-Value="model.Country" />
-        </div>
-        <div class="form-group">
-            <label>Postal Code</label>
-            <InputText class="form-control" @bind-Value="model.PostalCode" />
-        </div>
-        <div class="form-group">
-            <label>Materials</label>
-            <InputText class="form-control" @bind-Value="model.Materials" />
-        </div>
-        <div class="form-group">
-            <label>Width</label>
-            <InputText class="form-control" @bind-Value="model.Width" />
-        </div>
-        <div class="form-group">
-            <label>Height</label>
-            <InputText class="form-control" @bind-Value="model.Height" />
-        </div>
-        <div class="form-group">
-            <label>Price</label>
-            <InputNumber class="form-control" @bind-Value="model.Price" />
-        </div>
-
-        <button type="submit" class="btn btn-primary btn-block mt-5"> Update Artwork </button>
-    </EditForm>
+            <button type="submit" class="btn btn-primary btn-block mt-5"> Update Artwork </button>
+        </EditForm>
 
 
-</div>
+    </div>
 }
 else
 {
@@ -98,17 +115,72 @@ else
 
     [Parameter]
 
-    public int Id {get; set;}
-    private ArtworkUpdate model {get; set;}
+    public int Id { get; set; }
+    private ArtworkUpdate model { get; set; }
+
+    private ArtworkMediumTagMapping tagMapping { get; set; }
+
+    private IEnumerable<MediumTagListName> tags;
+
+    private int SelectedMediumTagId;
+
+
     private bool isLoading = true;
 
     private string errorMessage;
 
+    private IBrowserFile selectedFile;
+
+    private Stream _fileStream = null;
+    private string _selectedFileName = null;
+
+    private byte[] buffer;
+
+    string imgUrl = string.Empty;
+    public async Task OnChooseFile(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+
+        if (file == null)
+            return;
+
+        using (var stream = file.OpenReadStream(5000000)) //this is about 50MB max file size
+        {
+            _fileStream = new MemoryStream();
+            await stream.CopyToAsync(_fileStream);
+            _fileStream.Position = 0;
+            _selectedFileName = file.Name;
+        }
+
+        var buffer = new byte[_fileStream.Length];
+        await _fileStream.ReadAsync(buffer, 0, buffer.Length);
+        var base64 = Convert.ToBase64String(buffer);
+
+        imgUrl = $"data:image/png;base64,{base64}";
+        model.FullImage = buffer;
+    }
+
+    private string FullImageBase64
+    {
+        get
+        {
+            if (model.FullImage != null)
+            {
+                return Convert.ToBase64String(model.FullImage);
+            }
+            else
+            {
+                return string.Empty;
+            }
+        }
+    }
+
     protected override async Task OnInitializedAsync()
     {
         model = await Http.GetFromJsonAsync<ArtworkUpdate>($"/api/artwork/{Id}");
+        tags = await Http.GetFromJsonAsync<IEnumerable<MediumTagListName>>($"api/mediumtag/names");
         isLoading = false;
-        
+
     }
 
     private async void HandleSubmit()
@@ -117,8 +189,17 @@ else
 
         var response = await Http.PutAsJsonAsync<ArtworkUpdate>($"api/artwork/edit/{Id}", model);
 
-        if(response.IsSuccessStatusCode)
+        if (response.IsSuccessStatusCode)
         {
+            var mediumTagModel = new ArtworkMediumTagMapping
+                {
+                    ArtworksId = Id,
+                    MediumTagsId = SelectedMediumTagId
+                };
+
+            var result = await Http.PostAsJsonAsync<ArtworkMediumTagMapping>("api/artwork/create-mediumtag", mediumTagModel);
+
+            //add the put for mediumtags
             navigation.NavigateTo($"/artwork/{Id}");
         }
         else

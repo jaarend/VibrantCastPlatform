@@ -9,6 +9,10 @@ using Microsoft.Extensions.Logging;
 using Server.Models;
 using Server.Services.Artwork;
 using Shared.Models.Artwork;
+using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Authorization;
+using Shared.Models.Artwork.ArtworkMapping;
+using Shared.Models.MediumTags;
 
 namespace Server.Controllers
 {
@@ -53,22 +57,53 @@ namespace Server.Controllers
 
             if (!SetUserIdInService()) return Unauthorized();
 
-            bool wasSuccessful = await _artworkService.CreateArtworkMetaDataAsync(model);
+            bool wasSuccessful = await _artworkService.CreateArtworkAsync(model);
 
             //save the artwork to the database
 
-            if (wasSuccessful) return Ok(new { Message = "Artwork metadata created successfully" });
+            if (wasSuccessful) return Ok(new { Message = "Artwork uploaded successfully" });
+            else return UnprocessableEntity();
+        }
+
+        [HttpPost("create-mediumtag")]
+        public async Task<IActionResult> AddMediumTags(ArtworkMediumTagMapping model)
+        {
+            if (model == null) return BadRequest();
+
+            if (!SetUserIdInService()) return Unauthorized();
+
+            bool wasSuccessful = await _artworkService.AddMediumTagToArtwork(model);
+
+            if(wasSuccessful) return Ok();
             else return UnprocessableEntity();
         }
 
         //READ
 
+        //get all artwork owned by user
         [HttpGet]
         public async Task<List<ArtworkDetail>> Index()
         {
             if (!SetUserIdInService()) return new List<ArtworkDetail>();
 
             var artworks = await _artworkService.GetAllArtworkDetailAsync();
+
+            return artworks.ToList();
+        }
+        [HttpGet("{creatorId}/public")]
+        public async Task<List<ArtworkDetail>> ArtistProfileArtwork(string creatorId)
+        {
+
+            var artworks = await _artworkService.GetAllArtworkDetailsForPublicProfileAsync(creatorId);
+
+            return artworks.ToList();
+        }
+        
+        [AllowAnonymous]
+        [HttpGet("public")]
+        public async Task<List<ArtworkDetail>> PublicArtwork()
+        {
+            var artworks = await _artworkService.GetAllPublicArtworkDetailAsync();
 
             return artworks.ToList();
         }
@@ -84,6 +119,37 @@ namespace Server.Controllers
 
             return Ok(artwork);
         }
+        [HttpGet("public/{id}")]
+        public async Task<IActionResult> ArtworkPublic(int id)
+        {
+            var artwork = await _artworkService.GetArtworkDetailByIdAsync(id);
+            
+            if(artwork == null) return NotFound();
+
+            return Ok(artwork);
+        }
+
+        [HttpGet("mediumtag/{artworkId}")]
+        public async Task<List<MediumTagListName>> GetMediumTag(int artworkId)
+        {
+
+            // if (!SetUserIdInService()) return new List<MediumTagListName>();
+
+            var tags = await _artworkService.GetAllMediumTagsOnArt(artworkId);
+
+            return tags.ToList();
+
+        }
+
+        //get all artwork mapped to an org
+        [HttpGet("artwork-org-mapped/{orgId}")]
+        public async Task<List<ArtworkDetail>> GetArtworkFromMappedOrg(int orgId)
+        {
+            var artworks = await _artworkService.GetAllArtworkFromMappedOrg(orgId);
+
+            return artworks.ToList();
+        }
+
 
         //UPDATE
 
@@ -96,13 +162,15 @@ namespace Server.Controllers
 
             if(model.Id != id) return BadRequest();
 
-            bool wasSuccessful = await _artworkService.UpdateArtworkMetaData(model);
+            bool wasSuccessful = await _artworkService.UpdateArtwork(model);
 
             if(wasSuccessful) return Ok();
 
             return BadRequest();
 
         }
+
+        //just need the create medium and delete...
 
 
         //DELETE

@@ -28,6 +28,7 @@ namespace Server.Services.UserAccountInfo
             var userAccountEntity = new Models.UserAccountInfo
             {
                 Id = _userId,
+                ProfileImage = model.ProfileImage,
                 ArtistName = model.ArtistName,
                 FirstName = model.FirstName,
                 LastName = model.LastName,
@@ -66,6 +67,7 @@ namespace Server.Services.UserAccountInfo
 
             var detail = new UserAccountInfoDetail
             {
+                ProfileImage = userAccountInfoEntity.ProfileImage,
                 ArtistName = userAccountInfoEntity.ArtistName,
                 FirstName = userAccountInfoEntity.FirstName,
                 LastName = userAccountInfoEntity.LastName,
@@ -89,6 +91,77 @@ namespace Server.Services.UserAccountInfo
             return detail;
         }
 
+        //get artist by artist name
+        public async Task<UserAccountInfoDetail> GetUserAccountInfoByArtistNameAsync(string artistName)
+        {
+            var userAccountInfoEntity = await _dbContext
+                .UserAccountInfo
+                .FirstOrDefaultAsync(n => EF.Functions.Collate(n.ArtistName, "SQL_Latin1_General_CP1_CI_AS") == artistName);
+
+            if (userAccountInfoEntity is null)
+                return null;
+
+            var detail = new UserAccountInfoDetail
+            {
+                Id = userAccountInfoEntity.Id,
+                ProfileImage = userAccountInfoEntity.ProfileImage,
+                ArtistName = userAccountInfoEntity.ArtistName,
+                FirstName = userAccountInfoEntity.FirstName,
+                LastName = userAccountInfoEntity.LastName,
+                Description = userAccountInfoEntity.Description,
+                CommissionPrice = userAccountInfoEntity.CommissionPrice,
+                Address = userAccountInfoEntity.Address,
+                City = userAccountInfoEntity.City,
+                State = userAccountInfoEntity.State,
+                Country = userAccountInfoEntity.Country,
+                PostalCode = userAccountInfoEntity.PostalCode,
+                Website = userAccountInfoEntity.Website,
+                Booking = userAccountInfoEntity.Booking,
+                Instagram = userAccountInfoEntity.Instagram,
+                Facebook = userAccountInfoEntity.Facebook,
+                TwitterX = userAccountInfoEntity.TwitterX,
+                LinkedIn = userAccountInfoEntity.LinkedIn,
+                TikTok = userAccountInfoEntity.TikTok,
+                SnapChat = userAccountInfoEntity.SnapChat,
+                WhatsApp = userAccountInfoEntity.WhatsApp
+            };
+            return detail;
+        }
+
+        public async Task<IEnumerable<UserAccountInfoDetail>> GetAllPublicUsersAsync()
+        {
+            var publicUsers = _dbContext
+                .UserAccountInfo
+                .Select(n =>
+
+                new UserAccountInfoDetail
+                {
+                    Id = n.Id,
+                    ProfileImage = n.ProfileImage,
+                    ArtistName = n.ArtistName,
+                    FirstName = n.FirstName,
+                    LastName = n.LastName,
+                    Description = n.Description,
+                    CommissionPrice = n.CommissionPrice,
+                    Address = n.Address,
+                    City = n.City,
+                    State = n.State,
+                    Country = n.Country,
+                    PostalCode = n.PostalCode,
+                    Website = n.Website,
+                    Booking = n.Booking,
+                    Instagram = n.Instagram,
+                    Facebook = n.Facebook,
+                    TwitterX = n.TwitterX,
+                    LinkedIn = n.LinkedIn,
+                    TikTok = n.TikTok,
+                    SnapChat = n.SnapChat,
+                    WhatsApp = n.WhatsApp
+                });
+
+                return await publicUsers.ToListAsync();
+        }
+
 
         public async Task<bool> EditUserAccountInfoAsync(UserAccountInfoEdit model)
         {
@@ -99,6 +172,7 @@ namespace Server.Services.UserAccountInfo
                 .UserAccountInfo
                 .FirstOrDefaultAsync(n => n.Id == _userId);
 
+            entity.ProfileImage = model.ProfileImage;
             entity.ArtistName = model.ArtistName;
             entity.FirstName = model.FirstName;
             entity.LastName = model.LastName;
@@ -121,6 +195,6 @@ namespace Server.Services.UserAccountInfo
             entity.DateModified = DateTimeOffset.Now;
 
             return await _dbContext.SaveChangesAsync() == 1;
-        }    
+        }
     }
 }

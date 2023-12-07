@@ -1,0 +1,48 @@
+﻿@page "/profile/upgrade"
+@using global::Shared.Models.UserAccountInfo;
+@using global::Shared.Models.User;
+@using Microsoft.AspNetCore.Authorization;
+@attribute [Authorize]
+@inject HttpClient Http
+@inject NavigationManager navigation
+
+<PageTitle>Upgrade Membership</PageTitle>
+
+<h1>Upgrade Membership</h1>
+
+@if (errorMessage != null)
+{
+    <h5 class="text-danger">@errorMessage</h5>
+}
+
+<div class="container">
+    <button type="button" class="btn btn-primary btn-block mt-5" @onclick="HandleSubmit"> Submit </button>
+</div>
+
+
+@code {
+
+    private readonly UserMembershipUpgrade model = new();
+
+    private string errorMessage;
+
+    private async void HandleSubmit()
+    {
+
+        model.MembershipTypeId = 2;
+
+        //this will hit the membership upgrade endpoint
+        var createResponse = await Http.PutAsJsonAsync<UserMembershipUpgrade>("api/profile/accountinfo/membership-upgrade",
+        model);
+
+        if (createResponse.IsSuccessStatusCode)
+        {
+            navigation.NavigateTo("/profile");
+        }
+        else
+        {
+            errorMessage = "Could not upgrade membership right now. Please try again.";
+        }
+    }
+
+}

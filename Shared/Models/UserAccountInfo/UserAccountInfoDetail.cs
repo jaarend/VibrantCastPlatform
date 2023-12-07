@@ -8,7 +8,9 @@ namespace Shared.Models.UserAccountInfo
 {
     public class UserAccountInfoDetail
     {
-        
+        public string Id { get; set; }
+        public byte[]? ProfileImage { get; set; }
+
         [MaxLength(250)]
         public string ArtistName { get; set; } = string.Empty;
         [MaxLength(250)]

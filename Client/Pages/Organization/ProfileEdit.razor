@@ -1,0 +1,179 @@
+﻿@page "/organization/profile/edit/{Id:int}"
+@using global::Shared.Models.Organization;
+@using Microsoft.AspNetCore.Authorization;
+@using Microsoft.AspNetCore.Components.Forms;
+@attribute [Authorize]
+@inject HttpClient Http
+@inject NavigationManager navigation
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<PageTitle>Edit Organization Profile</PageTitle>
+
+<h1>Edit Organization Profile</h1>
+
+@if (errorMessage != null)
+{
+    <h5 class="text-danger">@errorMessage</h5>
+}
+
+<div class="container">
+
+    <EditForm Model="@orgProfile" OnValidSubmit="@SubmitEdit">
+
+        @if (orgProfile != null)
+        {
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="form-group">
+                <div class="card" style="width: 18rem;">
+                    <img src="data:image/png;base64,@FullImageBase64" alt=" Artwork Image" srcset="">
+                    <div class="card-body">
+                        <p class="card-text">Change your organization profile picture</p>
+                        <InputFile id="file" class="form-control" OnChange="OnChooseFile" />
+                        <div class="row">
+                            <img src="@imgUrl" />
+                        </div>
+                        <div class="form-group">
+                            <ValidationMessage For="@(() => orgProfile.ProfileImage)" />
+                        </div>
+                    </div>
+                </div>
+                <label>Tell us about your organization.</label>
+                <InputText class="form-control" @bind-Value="orgProfile.OrganizationName" />
+                <label>Description</label>
+                <InputText class="form-control" @bind-Value="orgProfile.Description" />
+                <label>Commission Price</label>
+                <InputNumber class="form-control" @bind-Value="orgProfile.CommissionPrice" />
+                <label>Address</label>
+                <InputText class="form-control" @bind-Value="orgProfile.Address" />
+                <label>City</label>
+                <InputText class="form-control" @bind-Value="orgProfile.City" />
+                <label>State</label>
+                <InputText class="form-control" @bind-Value="orgProfile.State" />
+                <label>Country</label>
+                <InputText class="form-control" @bind-Value="orgProfile.Country" />
+                <label>Postal Code</label>
+                <InputText class="form-control" @bind-Value="orgProfile.PostalCode" />
+                <label>Website</label>
+                <InputText class="form-control" @bind-Value="orgProfile.Website" />
+                <label>Booking Link</label>
+                <InputText class="form-control" @bind-Value="orgProfile.Booking" />
+                <label>Instagram</label>
+                <InputText class="form-control" @bind-Value="orgProfile.Instagram" />
+                <label>Facebook</label>
+                <InputText class="form-control" @bind-Value="orgProfile.Facebook" />
+                <label>TwitterX</label>
+                <InputText class="form-control" @bind-Value="orgProfile.TwitterX" />
+                <label>LinkedIn</label>
+                <InputText class="form-control" @bind-Value="orgProfile.LinkedIn" />
+                <label>TikTok</label>
+                <InputText class="form-control" @bind-Value="orgProfile.TikTok" />
+                <label>SnapChat</label>
+                <InputText class="form-control" @bind-Value="orgProfile.SnapChat" />
+                <label>WhatsApp</label>
+                <InputText class="form-control" @bind-Value="orgProfile.WhatsApp" />
+
+            </div>
+            <button type="submit" class="btn btn-primary btn-block mt-5"> Submit </button>
+        }
+    </EditForm>
+
+
+</div>
+
+
+@code {
+    private OrganizationInfoEdit orgProfile { get; set; } = new OrganizationInfoEdit();
+    [Parameter]
+    public int Id { get; set; }
+
+    public OrgUserMappingDetail OrgUserMappingDetail { get; set; }
+
+    private string errorMessage;
+    private IBrowserFile selectedFile;
+
+    private Stream _fileStream = null;
+    private string _selectedFileName = null;
+
+    private byte[] buffer;
+
+    string imgUrl = string.Empty;
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var userIdClaim = authState.User.FindFirst("sub");
+
+        var userId = userIdClaim.Value;
+        OrgUserMappingDetail = await Http.GetFromJsonAsync<OrgUserMappingDetail>($"/api/organization/checkmapping/{userId}");
+        
+        //check if authorized and admin
+        if (userIdClaim != null && OrgUserMappingDetail.UserId == userId && OrgUserMappingDetail.IsAdmin == true)
+        {
+
+            var orgId = OrgUserMappingDetail.OrganizationId;
+            orgProfile = await Http.GetFromJsonAsync<OrganizationInfoEdit>($"/api/organization/{orgId}");
+        }
+        else
+        {
+            errorMessage = "You need to be the admin of this organization to edit.";
+        }
+    }
+    public async Task OnChooseFile(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+
+        if (file == null)
+            return;
+
+        using (var stream = file.OpenReadStream(5000000)) //this is about 50MB max file size
+        {
+            _fileStream = new MemoryStream();
+            await stream.CopyToAsync(_fileStream);
+            _fileStream.Position = 0;
+            _selectedFileName = file.Name;
+        }
+
+        var buffer = new byte[_fileStream.Length];
+        await _fileStream.ReadAsync(buffer, 0, buffer.Length);
+        var base64 = Convert.ToBase64String(buffer);
+
+        imgUrl = $"data:image/png;base64,{base64}";
+        orgProfile.ProfileImage = buffer;
+    }
+
+    private string FullImageBase64
+    {
+        get
+        {
+            if (orgProfile.ProfileImage != null)
+            {
+                return Convert.ToBase64String(orgProfile.ProfileImage);
+            }
+            else
+            {
+                return string.Empty;
+            }
+        }
+    }
+
+
+
+    private async void SubmitEdit()
+    {
+
+        orgProfile.Id = OrgUserMappingDetail.OrganizationId;
+
+        var createResponse = await Http.PutAsJsonAsync<OrganizationInfoEdit>("api/organization/profile/edit", orgProfile);
+
+        if (createResponse.IsSuccessStatusCode)
+        {
+            navigation.NavigateTo($"/organizations/{orgProfile.Id}");
+        }
+        else
+        {
+            errorMessage = "Could not save account information right now. Please try again.";
+        }
+    }
+
+}

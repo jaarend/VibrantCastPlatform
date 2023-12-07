@@ -1,0 +1,143 @@
+﻿@page "/{orgName}/add-members/"
+@using global::Shared.Models.Organization;
+@using global::Shared.Models.UserAccountInfo;
+@using Microsoft.AspNetCore.Authorization;
+@using Microsoft.AspNetCore.Components.Forms;
+@attribute [Authorize]
+@inject HttpClient Http
+@inject NavigationManager navigation
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<PageTitle>Add Members</PageTitle>
+
+<h1>Add members to your Organization</h1>
+
+<a href="/@orgName/manage-members/">Go back to manage members</a>
+
+@if (errorMessage != null)
+{
+    <h5 class="text-danger">@errorMessage</h5>
+}
+
+<div class="container">
+    <div class="form-group">
+        <label for="userSelect">Select User:</label>
+        <InputSelect id="userSelect" @bind-Value="SelectArtistId">
+            @if (_artists == null)
+            {
+                <p><em>Loading...</em></p>
+            }
+            else
+            {
+                @foreach (var user in _artists)
+                {
+                    <option value="@user.Id">@user.Id</option>
+                }
+            }
+        </InputSelect>
+    </div>
+    <button type="submit" class="btn btn-primary btn-block mt-5" disabled="@isLoading" @onclick="AddUsersToOrg"> Submit
+    </button>
+
+
+
+</div>
+
+
+@code {
+
+    [Parameter]
+    public string orgName { get; set; }
+    public OrgInfoDetail OrgInfoDetail { get; set; } = new OrgInfoDetail();
+
+    private readonly OrgUserMappingCreate orgUserMapping = new();
+
+    private string SelectArtistId;
+
+    private IEnumerable<UserAccountInfoDetail> _artists;
+
+    [Parameter]
+    public OrgUserMappingDetail OrgUserMappingDetail { get; set; } = new OrgUserMappingDetail();
+
+    private string errorMessage;
+
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var userIdClaim = authState.User.FindFirst("sub");
+
+        if (userIdClaim != null && !string.IsNullOrEmpty(userIdClaim.Value))
+        {
+            var userId = userIdClaim.Value;
+
+            //get the mapping info
+            OrgUserMappingDetail = await Http.GetFromJsonAsync<OrgUserMappingDetail>($"/api/organization/checkmapping/{userId}");
+
+            //gets details if user is admin
+            OrgInfoDetail = await Http.GetFromJsonAsync<OrgInfoDetail>($"/api/organization/dashboard/{orgName}");
+
+        }
+        else
+        {
+            errorMessage = "You need to be the admin of this organization to add members.";
+        }
+
+        //get admin id
+        var adminUserId = userIdClaim.Value;
+
+        _artists = await Http.GetFromJsonAsync<List<UserAccountInfoDetail>>("api/profile/accountinfo/public-users");
+
+        //remove admin from list
+        _artists = _artists.Where(user => user.Id != adminUserId).ToList();
+
+        //fetch list of already mapped members
+        var orgMembers = await
+        Http.GetFromJsonAsync<List<OrgUserMappingDetail>>($"api/organization/org-mapped-users/{OrgUserMappingDetail.OrganizationId}");
+
+        //remove already listed members
+        _artists = _artists.Where(user => !orgMembers.Any(member => member.UserId == user.Id)).ToList();
+        isLoading = false;
+
+    }
+
+
+    private async void AddUsersToOrg()
+    {
+        if (isLoading)
+        {
+            return;
+        }
+        if (_artists != null)
+        {
+            if (SelectArtistId != null)
+            {
+                @* var selectedUser = _artists.FirstOrDefault(user => user.Id == SelectArtistId); *@
+                orgUserMapping.UserId = SelectArtistId;
+                orgUserMapping.OrganizationId = OrgUserMappingDetail.OrganizationId;
+
+                var createResponse = await Http.PostAsJsonAsync<OrgUserMappingCreate>("api/organization/add-members", orgUserMapping);
+
+                if (createResponse.IsSuccessStatusCode)
+                {
+                    navigation.NavigateTo($"/{@orgName}/manage-members/");
+                }
+                else
+                {
+                    errorMessage = "Could not save account information right now. Please try again.";
+                }
+            }
+            else
+            {
+                errorMessage = "No user selected.";
+            }
+        }
+        else
+        {
+            errorMessage = "No artists loaded.";
+        }
+    }
+
+}

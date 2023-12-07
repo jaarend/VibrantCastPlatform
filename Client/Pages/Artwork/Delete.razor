@@ -7,10 +7,10 @@
 @attribute [Authorize]
 @inject HttpClient Http
 @inject NavigationManager navigation
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
-<h3>Delete Artwork</h3>
 
-@if(Message != null)
+@if (Message != null)
 {
     <h2 class="text-danger">@Message</h2>
 }
@@ -18,60 +18,21 @@
 
 @if (!isLoading)
 {
+
+    @* create unauth/auth view *@
+
     <div class="container">
-    <h1>@model.Title</h1>
-        <div class="card">
-            <div class="text-center justify-content-between w-25">
-                <a href=@($"/artwork/edit/{Id}") class="btn btn-outline-primary">Edit</a>
-                <a href="#" @onclick="HandleClick" class="btn btn-danger text-white">Delete Artwork</a>
-                <hr />
-                <a href="/artwork">Back to all artwork</a>
+        <h1>@model.Title</h1>
+        <div class="text-right justify-content-between w-100">
+            <a href=@($"/artwork/edit/{Id}") class="btn btn-outline-primary">Edit</a>
+            <a href="#" @onclick="HandleClick" class="btn btn-danger text-white">Delete Artwork</a>
+            <a href="/artwork">Back to all artwork</a>
+        </div>
+        <div class="card mt-3">
+            <div class="d-flex justify-content-center align-items-center" style="height: 100%;">
+                <img src="data:image/png;base64,@FullImageBase64" alt="Artwork Image" srcset="" class="img-fluid">
             </div>
-            <div>
-                <h4 class="card-title">Title</h4>
-                <p class="card-text">@model.Title</p>
-            </div>
-            <div>
-                <h4 class="card-title">Description</h4>
-                <p class="card-text">@model.Description</p>
-            </div>
-            <div>
-                <h4 class="card-title">Address</h4>
-                <p class="card-text">@model.Address</p>
-            </div>
-            <div>
-                <h4 class="card-title">City</h4>
-                <p class="card-text">@model.City</p>
-            </div>
-            <div>
-                <h4 class="card-title">State</h4>
-                <p class="card-text">@model.State</p>
-            </div>
-            <div>
-                <h4 class="card-title">Country</h4>
-                <p class="card-text">@model.Country</p>
-            </div>
-            <div>
-                <h4 class="card-title">PostalCode</h4>
-                <p class="card-text">@model.PostalCode</p>
-            </div>
-            <div>
-                <h4 class="card-title">Materials</h4>
-                <p class="card-text">@model.Materials</p>
-            </div>
-            <div>
-                <h4 class="card-title">Width</h4>
-                <p class="card-text">@model.Width</p>
-            </div>
-            <div>
-                <h4 class="card-title">Height</h4>
-                <p class="card-text">@model.Height</p>
-            </div>
-            <div>
-                <h4 class="card-title">Price</h4>
-                <p class="card-text">@model.Price</p>
-            </div>
-            <div class="d-flex justify-content-center mt-3"></div>
+            
         </div>
 
     </div>
@@ -92,11 +53,49 @@ else
 
     private bool isLoading = true;
 
-    public string Message {get; set;}
+    public string Message { get; set; }
+
+    private string FullImageBase64
+    {
+        get
+        {
+            if (model.FullImage != null)
+            {
+                return Convert.ToBase64String(model.FullImage);
+            }
+            else
+            {
+                return string.Empty;
+            }
+        }
+    }
     protected override async Task OnInitializedAsync()
     {
-        model = await Http.GetFromJsonAsync<ArtworkDetail>($"/api/artwork/{Id}");
         isLoading = false;
+        model = await Http.GetFromJsonAsync<ArtworkDetail>($"/api/artwork/{Id}");
+
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var userIdClaim = authState.User.FindFirst("sub");
+
+        //check if logged in and is the creator of artwork
+        if (userIdClaim != null)
+        {
+            var userId = userIdClaim.Value;
+
+            if (userId == model.CreatorId)
+            {
+                return;
+            }
+            else
+            {
+                navigation.NavigateTo($"/");
+            }
+        }
+        else
+        {
+            navigation.NavigateTo($"/");
+        }
+
 
     }
 
@@ -104,7 +103,7 @@ else
     {
         var response = await Http.DeleteAsync($"/api/artwork/{Id}");
 
-        if(response.IsSuccessStatusCode)
+        if (response.IsSuccessStatusCode)
         {
             navigation.NavigateTo("/artwork");
         }

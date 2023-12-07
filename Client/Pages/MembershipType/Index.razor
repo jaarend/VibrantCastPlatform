@@ -1,0 +1,107 @@
+﻿@page "/memberships"
+@using global::Shared.Models.MembershipType;
+@using Newtonsoft.Json;
+@using Microsoft.AspNetCore.Components;
+@using Microsoft.AspNetCore.Components.Forms;
+@using Microsoft.AspNetCore.Authorization;
+@using System.Text.Json.Serialization;
+@using System.Diagnostics;
+@attribute [Authorize(Roles = "Admin")]
+@inject HttpClient Http
+@inject NavigationManager navigation
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<PageTitle>Membership Types Index</PageTitle>
+
+
+<h3>Membership Types (admin only)</h3>
+<a href="/memberships/create" class="btn btn-primary">Create new Membership</a>
+
+@if (_memberships == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+
+                <th>Name</th>
+                <th>Description</th>
+                <th>Monthly Price</th>
+                <th>Yearly Price</th>
+                <th>Artwork Limit</th>
+                <th>Experiences Limit</th>
+                <th>Date Created</th>
+                <th>Date Modified</th>
+
+
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var memberships in _memberships)
+            {
+                <tr>
+                    <td>
+                        @memberships.Name
+                    </td>
+                    <td>
+                        @memberships.Description
+                    </td>
+                    <td>
+                        @memberships.MonthlyAmount
+                    </td>
+                    <td>
+                        @memberships.YearlyAmount
+                    </td>
+                    <td>
+                        @memberships.ArtworkLimit
+                    </td>
+                    <td>
+                        @memberships.ExperiencesLimit
+                    </td>
+                    <td>
+                        @memberships.DateCreated
+                    </td>
+                    <td>
+                        @memberships.DateModified
+                    </td>
+                    <td>
+                        <div class="text-center justify-content-between w-25">
+                            <a href=@($"/memberships/edit/{memberships.Id}") class="btn btn-outline-primary">Edit</a>
+                            <a href=@($"/memberships/delete/{memberships.Id}") class="btn btn-outline-danger">Delete</a>
+                            <hr />
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+
+@code {
+
+    private IEnumerable<MembershipTypeDetail> _memberships;
+
+    private string[] userRoles;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        userRoles = user.Claims
+            .Where(c => c.Type == System.Security.Claims.ClaimTypes.Role)
+            .Select(c => c.Value)
+            .ToArray();
+
+
+        Debug.WriteLine($"User Roles: {string.Join(", ", userRoles)}");
+
+        _memberships = await Http.GetFromJsonAsync<List<MembershipTypeDetail>>("api/membershiptype");
+    }
+
+
+}

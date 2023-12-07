@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Shared.Models.MediumTags;
 
 namespace Shared.Models.Artwork
 {
@@ -9,6 +10,7 @@ namespace Shared.Models.Artwork
     {
         public int Id { get; set; }
         public string? Title { get; set; }
+        public byte[] FullImage { get; set; }
 
         public string? Description { get; set; }
 
@@ -29,6 +31,13 @@ namespace Shared.Models.Artwork
         public string? Height { get; set; }
 
         public float Price { get; set; }
+
+        // public virtual ICollection<MediumTag> MediumTags { get; set; }
+
+        // public Artwork()
+        // {
+        //     MediumTags = new HashSet<MediumTag>();
+        // }
 
     }
 }

@@ -15,7 +15,8 @@ namespace Server.Models
 
         public virtual Organization Organization {get; set;}
 
-        public string ProfileImage { get; set; } = string.Empty;
+        public byte[] ProfileImage { get; set; }
+        
         [MaxLength(500)]
         public string OrganizationName { get; set; } = string.Empty;
 

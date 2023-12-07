@@ -1,0 +1,129 @@
+﻿@page "/{orgName}/manage-members/"
+@using global::Shared.Models.Organization;
+@using global::Shared.Models.UserAccountInfo;
+@using Microsoft.AspNetCore.Authorization;
+@using Microsoft.AspNetCore.Components.Forms;
+@attribute [Authorize]
+@inject HttpClient Http
+@inject NavigationManager navigation
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<PageTitle>Manage Members of your Organization</PageTitle>
+
+<h1>Manage Members of your Organization</h1>
+
+@if (errorMessage != null)
+{
+    <h5 class="text-danger">@errorMessage</h5>
+}
+
+@if(Message != null)
+{
+    <h2 class="text-primary">@Message</h2>
+}
+
+<a href="/@orgName/dashboard/" class="btn btn-info m-3">Go back to dashboard</a>
+<a href="/@orgName/add-members/" class="btn btn-primary m-3">Add members to your organization</a>
+<div class="container">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between">
+            <span>Members of your Organization</span>
+        </div>
+
+        @if (_members != null)
+        {
+
+            <table class="table">
+                <thead>
+                    <th>UserId</th>
+                    <th>Is Admin?</th>
+                    <th>Actions</th>
+                </thead>
+                <tbody>
+                    @foreach (var member in _members)
+                    {
+                        <tr>
+                            <td>@member.UserId</td>
+                            <td>@member?.IsAdmin</td>
+                            <td><button type="submit" class="btn btn-danger btn-block mt-5" disabled="@isLoading" @onclick="(() => DeleteUserFromOrg(member.UserId))"> Delete </button></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+
+        else
+        {
+            <p>No Members</p>
+        }
+
+    </div>
+</div>
+
+
+@code {
+
+
+    private readonly OrgUserMappingCreate orgUserMapping = new();
+
+
+    private IEnumerable<OrgUserMappingDetail> _members;
+
+    [Parameter]
+    public string orgName { get; set; }
+    public OrgUserMappingDetail OrgUserMappingDetail { get; set; } = new OrgUserMappingDetail();
+
+    public OrgInfoDetail OrgInfoDetail { get; set; } = new OrgInfoDetail();
+
+
+    private string errorMessage;
+
+    private bool isLoading = true;
+
+    public string Message {get; set;}
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var userIdClaim = authState.User.FindFirst("sub");
+        var userId = userIdClaim.Value;
+        isLoading = false;
+        //get the mapping info
+        OrgUserMappingDetail = await Http.GetFromJsonAsync<OrgUserMappingDetail>($"/api/organization/checkmapping/{userId}");
+
+        //check the user's claim, if their id matches, and is admin of organization
+        if (userIdClaim != null && OrgUserMappingDetail.UserId == userId && OrgUserMappingDetail.IsAdmin == true)
+        {
+
+            //gets details if user is admin
+            OrgInfoDetail = await Http.GetFromJsonAsync<OrgInfoDetail>($"/api/organization/dashboard/{orgName}");
+
+            //this should get a list of userdetails that are mapped to the organization
+            _members = await Http.GetFromJsonAsync<List<OrgUserMappingDetail>>($"api/organization/org-mapped-users/{OrgUserMappingDetail.OrganizationId}");
+            _members = _members.Where(user => user.IsAdmin != true).ToList();
+
+
+        }
+        else
+        {
+            errorMessage = "You need to be the admin of this organization to add members.";
+        }
+    }
+
+
+    private async void DeleteUserFromOrg(string userId)
+    {
+        var response = await Http.DeleteAsync($"/api/organization/delete-org-user-mapping/{userId}");
+
+        if (response.IsSuccessStatusCode)
+        {
+            navigation.NavigateTo($"/{@orgName}/manage-members/");
+        }
+        else
+        {
+            Message = "Failed to delete member.";
+        }
+    }
+
+}

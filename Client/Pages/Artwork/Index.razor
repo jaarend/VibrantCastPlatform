@@ -8,13 +8,14 @@
 @inject HttpClient Http
 @inject NavigationManager navigation
 
-<PageTitle>Artwork Index</PageTitle>
+<PageTitle>Your Artwork</PageTitle>
 
-<h1>This will be a get to show all artwork owned by a user.</h1>
+<h2>All Your Artwork</h2>
 
-<h3>Artworks</h3>
+<a href="/artwork/create" class="btn btn-primary">Upload Art</a>
 
-@if(_artworks == null)
+
+@if (_artworks == null)
 {
     <p><em>Loading...</em></p>
 }
@@ -24,21 +25,37 @@ else
         <thead>
             <tr>
 
-            <th>Title</th>
-            <th>Description</th>
-            <th>Width</th>
-            <th>Height</th>
-            <th>Price</th>
+                <th>Image</th>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Width</th>
+                <th>Height</th>
+                <th>Price</th>
 
 
             </tr>
         </thead>
         <tbody>
-            @foreach(var artwork in _artworks)
+            @foreach (var artwork in _artworks)
             {
                 <tr>
                     <td>
+                        @{
+                            var imgString = Convert.ToBase64String(artwork.FullImage);
+                        }
+                        <div class="card col-md-8 mx-auto m-3" style="width: 18rem;">
+                            <a href="@($"/artwork/public/{artwork.Id}")">
+                                <img src="data:image/png;base64,@imgString" alt="Artwork Image" srcset="" class="card-img-top">
+                            </a>
+                        </div>
+                    </td>
+                    <td>
                         <strong>@artwork.Title</strong>
+                        <div class="text-center justify-content-between w-25">
+                            <a href=@($"/artwork/edit/{artwork.Id}") class="btn btn-outline-primary">Edit</a>
+                            @* add the delete page *@
+                            <a href=@($"/artwork/delete/{artwork.Id}") class="btn btn-outline-danger">Delete</a>
+                        </div>
                     </td>
                     <td>
                         @artwork.Description
@@ -59,7 +76,7 @@ else
 }
 
 
-@code{
+@code {
 
     private IEnumerable<ArtworkDetail> _artworks;
 

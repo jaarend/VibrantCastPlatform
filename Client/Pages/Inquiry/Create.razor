@@ -1,0 +1,59 @@
+﻿@page "/inquiries/create"
+@using global::Shared.Models.Inquiry;
+@using Microsoft.AspNetCore.Authorization;
+@attribute [Authorize]
+@inject HttpClient Http
+@inject NavigationManager navigation
+
+<PageTitle>Account Information</PageTitle>
+
+<h1>Inquiries</h1>
+
+@if(errorMessage != null)
+{
+    <h5 class="text-danger">@errorMessage</h5>
+}
+
+<div class="container">
+    <EditForm Model="@model" OnValidSubmit="@HandleSubmit">
+        <DataAnnotationsValidator/>
+        <ValidationSummary/>
+
+        <div class="form-group">
+            <label>Send Message To:</label>
+            <InputText class="form-control" @bind-Value="model.ToUserId"/>
+            <label>Artwork</label>
+            <InputNumber class="form-control" @bind-Value="model.ArtworkId"/>
+            <label>Subject</label>
+            <InputText class="form-control" @bind-Value="model.Title"/>
+            <label>Description</label>
+            <InputText class="form-control" @bind-Value="model.Description"/>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block mt-5"> Submit </button>
+    </EditForm>
+
+
+</div>
+
+
+@code {
+
+    private readonly InquiryCreate model = new();
+
+    private string errorMessage;
+
+    private async void HandleSubmit()
+    {
+        var createResponse = await Http.PostAsJsonAsync<InquiryCreate>("api/inquiry/create", model);
+
+        if(createResponse.IsSuccessStatusCode)
+        {
+            navigation.NavigateTo("/inquiries");
+        }
+        else
+        {
+            errorMessage = "Could not create inquiry right now. Please try again.";
+        }
+    }
+
+}

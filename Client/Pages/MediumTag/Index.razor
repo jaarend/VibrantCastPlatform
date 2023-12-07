@@ -1,0 +1,75 @@
+﻿@page "/mediumtags"
+@using global::Shared.Models.MediumTags;
+@using Newtonsoft.Json;
+@using Microsoft.AspNetCore.Components.Forms;
+@using Microsoft.AspNetCore.Authorization;
+@using System.Text.Json.Serialization;
+@attribute [Authorize]
+@inject HttpClient Http
+@inject NavigationManager navigation
+
+<PageTitle>Medium Tags Index</PageTitle>
+
+
+<h3>Medium Tags</h3>
+<a href="/mediumtag/create" class="btn btn-primary">Create new medium tag</a>
+
+@if (_mediumTags == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+
+                <th>Name</th>
+                <th>Description</th>
+                <th>Date Created</th>
+                <th>Date Modified</th>
+
+
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var mediumTags in _mediumTags)
+            {
+                <tr>
+                    <td>
+                        @mediumTags.Name
+                    </td>
+                    <td>
+                        @mediumTags.Description
+                    </td>
+                    <td>
+                        @mediumTags.DateCreated
+                    </td>
+                    <td>
+                        @mediumTags.DateModified
+                    </td>
+                    <td>
+                        <div class="text-center justify-content-between w-25">
+                            <a href=@($"/mediumtag/edit/{mediumTags.Id}") class="btn btn-outline-primary">Edit</a>
+                            <a href=@($"/mediumtag/delete/{mediumTags.Id}") class="btn btn-outline-danger">Delete</a>
+                            <hr />
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+
+@code {
+
+    private IEnumerable<MediumTagDetail> _mediumTags;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _mediumTags = await Http.GetFromJsonAsync<List<MediumTagDetail>>("api/mediumtag");
+    }
+
+
+}

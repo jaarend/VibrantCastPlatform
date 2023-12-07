@@ -1,0 +1,102 @@
+﻿@page "/inquiries"
+@using global::Shared.Models.Inquiry;
+@using Microsoft.AspNetCore.Authorization;
+@attribute [Authorize]
+@using Newtonsoft.Json;
+@inject HttpClient Http
+@inject NavigationManager navigation
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<PageTitle>Inquiries</PageTitle>
+
+<h1>Inquiries Inbox</h1>
+
+<a href="/inquiries/create">Write an inquiry</a>
+<a href="/inquiries/sent">Sent inquiries</a>
+
+@if (errorMessage != null)
+{
+    <h5 class="text-danger">@errorMessage</h5>
+}
+
+
+<div class="container">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between">
+            <span>Inquiries</span>
+        </div>
+
+        @if (InquiryDetail != null)
+        {
+
+            <table class="table">
+                <thead>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th>From</th>
+                    <th>ArtworkId</th>
+                    <th>DateCreated</th>
+                    <th>DateOpened</th>
+                </thead>
+                <tbody>
+                    @foreach (var inquiry in InquiryDetail)
+                    {
+                        <tr>
+                            <td><strong>@inquiry?.Title</strong></td>
+                            <td>@inquiry?.Description</td>
+                            <td>@inquiry?.FromUserId</td>
+                            <td>@inquiry?.ArtworkId</td>
+                            <td>@inquiry?.DateCreated</td>
+                            <td>@inquiry?.DateOpened</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+
+        else
+        {
+            <p>No inquiries</p>
+        }
+
+    </div>
+</div>
+
+
+@code {
+
+    private IEnumerable<InquiryDetail> InquiryDetail;
+
+    private string errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var userIdClaim = authState.User.FindFirst("sub");
+
+        if (userIdClaim != null && !string.IsNullOrEmpty(userIdClaim.Value))
+        {
+            var userId = userIdClaim.Value;
+
+            try
+            {
+                var json = await Http.GetStringAsync($"/api/inquiry/");
+                Console.WriteLine($"Received JSON: {json}");
+                InquiryDetail = JsonConvert.DeserializeObject<IEnumerable<InquiryDetail>>(json);
+
+            }
+
+            catch (Exception ex)
+            {
+                errorMessage = $"Error: {ex.Message}";
+            }
+
+        }
+        else
+        {
+            errorMessage = "Inquiries not found. You need to be logged in to see your profile.";
+        }
+
+    }
+
+}
