@@ -104,10 +104,12 @@
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var userIdClaim = authState.User.FindFirst("sub");
 
-        if (userIdClaim != null && !string.IsNullOrEmpty(userIdClaim.Value))
+        var userId = userIdClaim.Value;
+        OrgUserMappingDetail = await Http.GetFromJsonAsync<OrgUserMappingDetail>($"/api/organization/checkmapping/{userId}");
+        
+        //check if authorized and admin
+        if (userIdClaim != null && OrgUserMappingDetail.UserId == userId && OrgUserMappingDetail.IsAdmin == true)
         {
-            var userId = userIdClaim.Value;
-            OrgUserMappingDetail = await Http.GetFromJsonAsync<OrgUserMappingDetail>($"/api/organization/checkmapping/{userId}");
 
             var orgId = OrgUserMappingDetail.OrganizationId;
             orgProfile = await Http.GetFromJsonAsync<OrganizationInfoEdit>($"/api/organization/{orgId}");
@@ -166,7 +168,7 @@
 
         if (createResponse.IsSuccessStatusCode)
         {
-            navigation.NavigateTo($"/organizations/{Id}");
+            navigation.NavigateTo($"/organizations/{orgProfile.Id}");
         }
         else
         {

@@ -1,4 +1,9 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@inject AuthenticationStateProvider AuthenticationStateProvider
+@using global::Shared.Models.Organization;
+@inject HttpClient Http
+
+
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="">VibrantCastPlatform</a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
@@ -10,8 +15,8 @@
 <div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
     <nav class="flex-column">
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
+            <NavLink class="nav-link" href="artwork">
+                <span class="oi oi-plus" aria-hidden="true"></span> Artwork
             </NavLink>
         </div>
         <div class="nav-item px-3">
@@ -20,15 +25,24 @@
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="artwork">
-                <span class="oi oi-plus" aria-hidden="true"></span> Artwork
+            <NavLink class="nav-link" href="/community">
+                <span class="oi oi-plus" aria-hidden="true"></span> Community
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="inquiries">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Inquiries
+            <NavLink class="nav-link" href="/explore">
+                <span class="oi oi-plus" aria-hidden="true"></span> Explore
             </NavLink>
         </div>
+        @if(OrgUserMappingDetail.IsAdmin == true)
+        {
+
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="@($"/{orgName}/dashboard")">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span> @OrgInfoDetail.OrganizationName
+                </NavLink>
+            </div>
+        }
         <AuthorizeView Roles="Admin">
             <div class="nav-item px-3">
                 <NavLink class="nav-link" href="admin">
@@ -44,6 +58,52 @@
     private bool collapseNavMenu = true;
 
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+
+    //this will check if user is admin of an org
+
+    [Parameter]
+    public string orgName {get; set;}
+
+    private int orgId;
+
+    private string userId;
+    public OrgInfoDetail OrgInfoDetail { get; set; } = new OrgInfoDetail();
+    public OrgUserMappingDetail OrgUserMappingDetail { get; set; } = new OrgUserMappingDetail();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var userIdClaim = authState.User.FindFirst("sub");
+
+        if (userIdClaim != null)
+        {
+             var userId = userIdClaim.Value;
+            //get the mapping info
+            OrgUserMappingDetail = await Http.GetFromJsonAsync<OrgUserMappingDetail>($"/api/organization/checkmapping/{userId}");
+
+            //check the user's claim, if their id matches, and is admin of organization
+            if (userIdClaim != null && OrgUserMappingDetail.UserId == userId && OrgUserMappingDetail.IsAdmin == true)
+            {
+
+                orgId = OrgUserMappingDetail.OrganizationId;
+
+                //gets details if user is admin
+                OrgInfoDetail = await Http.GetFromJsonAsync<OrgInfoDetail>($"/api/organization/{orgId}");
+
+                orgName = OrgInfoDetail.OrganizationName;
+
+            }
+            else
+            {
+                return;
+            }
+        }
+        else
+        {
+            return;
+        }
+    }
 
     private void ToggleNavMenu()
     {

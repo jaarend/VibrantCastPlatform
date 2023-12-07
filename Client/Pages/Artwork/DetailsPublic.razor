@@ -1,0 +1,169 @@
+﻿@page "/artwork/public/{Id:int}"
+@using global::Shared.Models.Artwork;
+@using global::Shared.Models.MediumTags;
+@using global::Shared.Models.Artwork.ArtworkMapping;
+@using global::Shared.Models.UserAccountInfo;
+@using Newtonsoft.Json;
+@using Microsoft.AspNetCore.Components.Forms;
+@using Microsoft.AspNetCore.Authorization;
+@using System.Text.Json.Serialization;
+@inject HttpClient Http
+@inject IHttpClientFactory HttpClientFactory
+@inject NavigationManager navigation
+
+
+@if (!isLoading)
+{
+
+    <div class="container justify-content-center p-0" style="width: 90%">
+        <div class="container justify-content-center p-0">
+            <div class="d-flex justify-content-center align-items-center" style="height: 100%;">
+                <img src="data:image/png;base64,@FullImageBase64" alt="Artwork Image" srcset="" class="img-fluid">
+            </div>
+            <div class="container p-0 mt-3 mb-5" style="width: 90%">
+                <h4 class="card-text">@model.Description</h4>
+            </div>
+        </div>
+        <div class="container mx-auto p-0 ">
+            <div class="col-md-8">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h2 class="d-flex align-items-center">
+                            <a href="/artist/@userDetail.ArtistName" class="stretched-link">
+                                <img src="data:image/png;base64,@ProfileImg" class="rounded-circle me-2 fit-cover"
+                                    width="40" height="40" alt="Profile Image">
+                            </a>
+                            <span class="">@userDetail.FirstName @userDetail.LastName
+                                (@userDetail.ArtistName)</span>
+                        </h2>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted mb-2">@model.Description</p>
+                        <a href=@($"/inquiries") class="btn btn-outline-secondary">Message</a>
+                        <div class="row d-flex justify-content-between mt-5">
+                            <div class="col-6">
+                                <p class="card-title "><strong>Materials:</strong></p>
+                                <p class="card-text">@model.Materials</p>
+                            </div>
+                            <div class="col-6">
+                                <p class="card-title "><strong>Mediums:</strong></p>
+                                @if (tags != null)
+                                {
+                                    @foreach (var tag in tags)
+                                    {
+                                        <p class="card-text d-inline-block">@tag.Name</p>
+                                    }
+                                }
+                            </div>
+                        </div>
+                        <div class="row d-flex justify-content-between">
+                            <div class="col-6">
+                                <p class="card-title "><strong>Price:</strong></p>
+                                <p class="card-text">$@model.Price</p>
+                            </div>
+                            <div class="col-6">
+                                <p class="card-title "><strong>Dimensions:</strong></p>
+                                <p class="card-text">@model.Width (in) x @model.Height (in)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+}
+else
+{
+    <p>Loading...</p>
+}
+
+
+
+@code {
+
+    [Parameter]
+
+    public int Id { get; set; }
+    private ArtworkDetail model { get; set; } = new ArtworkDetail();
+    private UserAccountInfoDetail userDetail { get; set; } = new UserAccountInfoDetail();
+
+    private IEnumerable<MediumTagListName> tags;
+
+    private int SelectedMediumTagId;
+
+    private string? errorMessage;
+
+    private string FullImageBase64
+    {
+        get
+        {
+            if (model.FullImage != null)
+            {
+                return Convert.ToBase64String(model.FullImage);
+            }
+            else
+            {
+                return string.Empty;
+            }
+        }
+    }
+    private string ProfileImg
+    {
+        get
+        {
+            if (userDetail.ProfileImage != null)
+            {
+                return Convert.ToBase64String(userDetail.ProfileImage);
+            }
+            else
+            {
+                return string.Empty;
+            }
+        }
+    }
+
+    private bool isLoading = true;
+    protected override async Task OnInitializedAsync()
+    {
+        isLoading = false;
+
+        var HttpPublic = HttpClientFactory.CreateClient("HttpPublic");
+
+        try
+        {
+            model = await HttpPublic.GetFromJsonAsync<ArtworkDetail>($"/api/artwork/public/{Id}");
+            //gets medium tags assoicated with artwork
+            tags = await HttpPublic.GetFromJsonAsync<IEnumerable<MediumTagListName>>($"api/artwork/mediumtag/{Id}");
+
+
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error: {ex.Message}";
+        }
+
+        if (model != null)
+        {
+            var userId = model.CreatorId;
+
+            try
+            {
+                userDetail = await HttpPublic.GetFromJsonAsync<UserAccountInfoDetail>($"/api/profile/accountinfo/public-user/{userId}");
+            }
+
+            catch (Exception ex)
+            {
+                errorMessage = $"Error: {ex.Message}";
+            }
+
+
+        }
+
+        else
+        {
+            errorMessage = "UserID not found.";
+        }
+    }
+
+}

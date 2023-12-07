@@ -80,12 +80,21 @@ namespace Server.Controllers
 
         //READ
 
+        //get all artwork owned by user
         [HttpGet]
         public async Task<List<ArtworkDetail>> Index()
         {
             if (!SetUserIdInService()) return new List<ArtworkDetail>();
 
             var artworks = await _artworkService.GetAllArtworkDetailAsync();
+
+            return artworks.ToList();
+        }
+        [HttpGet("{creatorId}/public")]
+        public async Task<List<ArtworkDetail>> ArtistProfileArtwork(string creatorId)
+        {
+
+            var artworks = await _artworkService.GetAllArtworkDetailsForPublicProfileAsync(creatorId);
 
             return artworks.ToList();
         }
@@ -110,18 +119,37 @@ namespace Server.Controllers
 
             return Ok(artwork);
         }
+        [HttpGet("public/{id}")]
+        public async Task<IActionResult> ArtworkPublic(int id)
+        {
+            var artwork = await _artworkService.GetArtworkDetailByIdAsync(id);
+            
+            if(artwork == null) return NotFound();
+
+            return Ok(artwork);
+        }
 
         [HttpGet("mediumtag/{artworkId}")]
         public async Task<List<MediumTagListName>> GetMediumTag(int artworkId)
         {
 
-            if (!SetUserIdInService()) return new List<MediumTagListName>();
+            // if (!SetUserIdInService()) return new List<MediumTagListName>();
 
             var tags = await _artworkService.GetAllMediumTagsOnArt(artworkId);
 
             return tags.ToList();
 
         }
+
+        //get all artwork mapped to an org
+        [HttpGet("artwork-org-mapped/{orgId}")]
+        public async Task<List<ArtworkDetail>> GetArtworkFromMappedOrg(int orgId)
+        {
+            var artworks = await _artworkService.GetAllArtworkFromMappedOrg(orgId);
+
+            return artworks.ToList();
+        }
+
 
         //UPDATE
 

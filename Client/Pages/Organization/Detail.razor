@@ -1,5 +1,6 @@
 ﻿@page "/organizations/{Id:int}"
 @using global::Shared.Models.Organization;
+@using global::Shared.Models.Artwork;
 @using Microsoft.AspNetCore.Authorization;
 @inject HttpClient Http
 @inject IHttpClientFactory HttpClientFactory
@@ -9,89 +10,61 @@
 <PageTitle>@OrgInfoDetail.OrganizationName</PageTitle>
 
 
-@* this should be a list of organizations *@
-<h1>@OrgInfoDetail.OrganizationName</h1>
-
 @if (errorMessage != null)
 {
     <h5 class="text-danger">@errorMessage</h5>
 }
 
-<div class="container">
-    <div class="card">
-        <div class="card-header d-flex justify-content-between">
-            <span>Profile</span>
-        </div>
-
-        @if (OrgInfoDetail != null)
-        {
-            if (OrgInfoDetail.ProfileImage != null)
+<div class="container py-2 py-xl-5">
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            @if (OrgInfoDetail.ProfileImage != null)
             {
                 var imgString = Convert.ToBase64String(OrgInfoDetail.ProfileImage);
-                <div class="card" style="width: 18rem;">
-                    <img src="data:image/png;base64,@imgString" alt="Profile Image" srcset="">
+                <div class="p-xl-5 m-xl-5">
+                    <img class="rounded img-fluid w-100 fit-cover" style="min-height: 300px;"
+                        src="data:image/png;base64,@imgString" alt="@OrgInfoDetail.OrganizationName Image" />
                 </div>
             }
-            <div class="card-body">
-                <h4 class="card-title">@OrgInfoDetail.OrganizationName</h4>
-            </div>
-            <div class="card-body">
-                <h4 class="card-title">@OrgInfoDetail.Description</h4>
-            </div>
-            <div class="card-body">
-                <h4 class="card-title">$ @OrgInfoDetail.CommissionPrice</h4>
-            </div>
-            <div class="card-body">
-                <h4 class="card-title">@OrgInfoDetail.Address</h4>
-            </div>
-            <div class="card-body">
-                <h4 class="card-title">@OrgInfoDetail.City</h4>
-            </div>
-            <div class="card-body">
-                <h4 class="card-title">@OrgInfoDetail.State</h4>
-            </div>
-            <div class="card-body">
-                <h4 class="card-title">@OrgInfoDetail.Country</h4>
-            </div>
-            <div class="card-body">
-                <h4 class="card-title">@OrgInfoDetail.PostalCode</h4>
-            </div>
-            <div class="card-body">
-                <h4 class="card-title">@OrgInfoDetail.Website</h4>
-            </div>
-            <div class="card-body">
-                <h4 class="card-title">@OrgInfoDetail.Booking</h4>
-            </div>
-            <div class="card-body">
-                <h4 class="card-title">@OrgInfoDetail.Instagram</h4>
-            </div>
-            <div class="card-body">
-                <h4 class="card-title">@OrgInfoDetail.Facebook</h4>
-            </div>
-            <div class="card-body">
-                <h4 class="card-title">@OrgInfoDetail.TwitterX</h4>
-            </div>
-            <div class="card-body">
-                <h4 class="card-title">@OrgInfoDetail.LinkedIn</h4>
-            </div>
-            <div class="card-body">
-                <h4 class="card-title">@OrgInfoDetail.TikTok</h4>
-            </div>
-            <div class="card-body">
-                <h4 class="card-title">@OrgInfoDetail.SnapChat</h4>
-            </div>
-            <div class="card-body">
-                <h4 class="card-title">@OrgInfoDetail.WhatsApp</h4>
-            </div>
-        }
-        else
-        {
-            <p>loading...</p>
-        }
-    </div>
+        </div>
 
+        <div class="col-md-6 d-md-flex align-items-md-center mb-4">
+            <div style="max-width: 350px;">
+                <h2 class="text-uppercase font-weight-bold">@OrgInfoDetail.OrganizationName</h2>
+                <p class="my-3">@OrgInfoDetail.Description</p>
+                <a class="btn btn-primary btn-lg mr-2" role="button" href="#">Commission</a>
+                <a class="btn btn-outline-primary btn-lg" role="button" href="#">Website</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="col">
+    @if (_artworkList != null)
+    {
+        <div class="row g-3 art-grid">
+            @foreach (var artwork in _artworkList)
+            {
+                <div class="col-lg-3 col-md-4 mb-3">
+                    <a href="@($"/artwork/public/{artwork.Id}")">
+                        <img src="data:image/png;base64,@Convert.ToBase64String(artwork.FullImage)" alt="@artwork.Title"
+                            class="img-fluid rounded artwork-image">
+                    </a>
+                    <h5 class="artwork-title">@artwork.Title</h5>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <p>Loading...</p>
+    }
 
 </div>
+
+
+
 
 
 @code {
@@ -99,6 +72,8 @@
     [Parameter]
     public int Id { get; set; }
     public OrgInfoDetail OrgInfoDetail { get; set; } = new OrgInfoDetail();
+
+    private IEnumerable<ArtworkDetail> _artworkList;
 
     private string errorMessage;
 
@@ -109,6 +84,9 @@
         try
         {
             OrgInfoDetail = await HttpPublic.GetFromJsonAsync<OrgInfoDetail>($"/api/organization/{Id}");
+
+            //get all artwork from members of this organization
+            _artworkList = await HttpPublic.GetFromJsonAsync<List<ArtworkDetail>>($"api/artwork/artwork-org-mapped/{Id}");
         }
         catch (Exception ex)
         {

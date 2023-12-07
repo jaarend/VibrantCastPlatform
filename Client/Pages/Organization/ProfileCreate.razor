@@ -28,7 +28,7 @@
             <div class="row">
                 <img src="@imgUrl" />
             </div>
-            <label>Tell us about your organization.</label>
+            <label>Name</label>
             <InputText class="form-control" @bind-Value="orgProfile.OrganizationName" />
             <label>Description</label>
             <InputText class="form-control" @bind-Value="orgProfile.Description" />
@@ -113,27 +113,7 @@
 
     //grab the admin userId to allow profile creation
 
-    @* protected override async Task OnInitializedAsync()
-{
-var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-var userIdClaim = authState.User.FindFirst("sub");
-
-if (userIdClaim != null && !string.IsNullOrEmpty(userIdClaim.Value))
-{
-var userId = userIdClaim.Value;
-
-//get the mapping info
-OrgUserMappingDetail = await Http.GetFromJsonAsync<OrgUserMappingDetail>($"/api/organization/checkmapping/{userId}");
-
-}
-else
-{
-errorMessage = "You need to be the admin of this organization to edit.";
-}
-
-} *@
-
-    private async void CompleteProfile()
+    protected override async Task OnInitializedAsync()
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var userIdClaim = authState.User.FindFirst("sub");
@@ -151,13 +131,18 @@ errorMessage = "You need to be the admin of this organization to edit.";
             errorMessage = "You need to be the admin of this organization to edit.";
         }
 
+    }
+
+    private async void CompleteProfile()
+    {
+
         orgProfile.Id = OrgUserMappingDetail.OrganizationId;
 
         var createResponse = await Http.PostAsJsonAsync<OrganizationInfoCreate>("api/organization/profile", orgProfile);
 
         if (createResponse.IsSuccessStatusCode)
         {
-            navigation.NavigateTo("/organization");
+            navigation.NavigateTo("/organization"); //this should go to org user admin dashboard
         }
         else
         {

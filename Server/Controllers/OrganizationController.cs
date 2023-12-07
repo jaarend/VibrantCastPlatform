@@ -119,23 +119,34 @@ namespace Server.Controllers
             return orgMappingDetails.ToList();
         }
 
-        //get org profile
+        //get org profile by Id...may replace
         [HttpGet("{orgId}")]
         public async Task<IActionResult> Profile(int orgId)
         {
             //got rid of the check to see if user is logged in, this will be a public endpoint
 
-            var userAccountInfo = await _organizationService.GetOrgInfoByIdAsync(orgId);
+            var orgAccountDetail = await _organizationService.GetOrgInfoByIdAsync(orgId);
 
-            if (userAccountInfo == null) return NotFound();
+            if (orgAccountDetail == null) return NotFound();
 
-            return Ok(userAccountInfo);
+            return Ok(orgAccountDetail);
+        }
+        //get org by orgName for dashbaord
+        [HttpGet("dashboard/{orgName}")]
+        public async Task<IActionResult> OrgDetailByName(string orgName)
+        {
+            //got rid of the check to see if user is logged in, this will be a public endpoint
+
+            var orgAccountDetail = await _organizationService.GetOrgInfoByOrgNameAsync(orgName);
+
+            if (orgAccountDetail == null) return NotFound();
+
+            return Ok(orgAccountDetail);
         }
 
         [HttpGet("all")]
         public async Task<List<OrgInfoDetail>> Index()
         {
-            if (!SetUserIdInService()) return new List<OrgInfoDetail>();
 
             var orgs = await _organizationService.GetAllOrgInfoAsync();
 

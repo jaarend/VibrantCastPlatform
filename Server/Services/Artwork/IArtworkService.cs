@@ -18,8 +18,14 @@ namespace Server.Services.Artwork
 
         Task<IEnumerable<MediumTagListName>> GetAllMediumTagsOnArt(int artworkId);
         Task<IEnumerable<ArtworkDetail>> GetAllArtworkDetailAsync();
+
+        //get all artwork for public artist profile
+        Task<IEnumerable<ArtworkDetail>> GetAllArtworkDetailsForPublicProfileAsync(string creatorId);
         Task<ArtworkDetail> GetArtworkDetailByIdAsync(int artworkId);
         Task<IEnumerable<ArtworkDetail>> GetAllPublicArtworkDetailAsync();
+
+        //get all artwork from users mapped to an org
+        Task<IEnumerable<ArtworkDetail>> GetAllArtworkFromMappedOrg(int orgId);
         Task<bool> UpdateArtwork(ArtworkUpdate model);
 
         Task<bool> DeleteArtworkAsync(int artworkId);

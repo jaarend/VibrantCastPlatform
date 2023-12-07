@@ -15,19 +15,77 @@
     <h5 class="text-danger">@errorMessage</h5>
 }
 
-<div class="container">
-    @* this part will create the Organization, later will handle membership differently *@
+<div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center" style="width: 800px;">
 
-        <EditForm Model="@orgModel" OnValidSubmit="@CreateOrg">
-        <DataAnnotationsValidator />
-        <ValidationSummary />
-
-        <div class="form-group">
-            <label>Pick your membership.</label>
-            <InputNumber class="form-control" @bind-Value="orgModel.MembershipTypeId" />
+    <div class="container" style="">
+        <div class="m-5">
+            <h1 class="display-4">Pricing<p class="lead">Get the most out of VibrantCast.</p>
+            </h1>
         </div>
-        <button type="submit" class="btn btn-primary btn-block mt-5"> Submit </button>
-    </EditForm>
+    </div>
+    <div class="card-deck mb-3 text-center">
+        <div class="card mb-4 box-shadow">
+            <div class="card-header">
+                <h4 class="my-0 font-weight-normal">Gallery</h4>
+            </div>
+            <div class="card-body">
+                <h1 class="card-title pricing-card-title">$99&nbsp;<small class="text-muted">/ mo</small></h1>
+                <ul class="list-unstyled mt-3 mb-4">
+
+                    <li>Unlimited artwork uploads</li>
+                    <li>Unlimited members in your gallery</li>
+                    <li>$0 commission fee</li>
+                    <li>100 GB of storage included</li>
+                    <li>Priority email support</li>
+
+                </ul>
+                @* this button should pass into selectedMembershipId the int value of 4*@
+                <button type="button" class="btn btn-lg btn-block btn-primary"
+                    @onclick="() => SetMembershipId(4)">Upgrade</button>
+            </div>
+        </div>
+        <div class="card mb-4 box-shadow">
+            <div class="card-header">
+                <h4 class="my-0 font-weight-normal">Artist Collective</h4>
+            </div>
+            <div class="card-body">
+                <h1 class="card-title pricing-card-title">$49<small class="text-muted">/ mo</small></h1>
+                <ul class="list-unstyled mt-3 mb-4">
+                    <li>100 artworks per person</li>
+                    <li>10 artists in a group</li>
+                    <li>$0 commission fee</li>
+                    <li>100 GB of storage included</li>
+                    <li>Priority email support</li>
+
+                </ul>
+                @* this button should pass into selectedMembershipId the int value of 3*@
+                <button type="button" class="btn btn-lg btn-block btn-primary"
+                    @onclick="() => SetMembershipId(3)">Upgrade</button>
+            </div>
+        </div>
+        <div class="card mb-4 box-shadow">
+            <div class="card-header">
+                <h4 class="my-0 font-weight-normal">School</h4>
+            </div>
+            <div class="card-body">
+                <h1 class="card-title pricing-card-title">$59<small class="text-muted">/ mo</small></h1>
+                <ul class="list-unstyled mt-3 mb-4">
+                    <li>
+                    <li>Unlimited artwork uploads</li>Unlimited Student accounts</li>
+                    <li>100 GB of storage included</li>
+                    <li>Priority email support</li>
+                    <li>Help center access</li>
+                </ul>
+                @* this button should pass into selectedMembershipId the int value of 5*@
+                <button type="button" class="btn btn-lg btn-block btn-primary"
+                    @onclick="() => SetMembershipId(5)">Upgrade</button>
+            </div>
+        </div>
+    </div>
+    <div>
+        <button type="button" class="btn btn-lg btn-block btn-primary"
+            @onclick="() => SetMembershipId(1)">Continue with Free Membership</button>
+    </div>
 </div>
 
 
@@ -36,9 +94,18 @@
     private readonly OrganizationCreate orgModel = new();
     private string errorMessage;
 
+    private int selectedMembershipId;
+
+    Task SetMembershipId(int id)
+    {
+        selectedMembershipId = id;
+        CreateOrg();
+        return Task.CompletedTask;
+    }
+
     private async void CreateOrg()
     {
-        
+        orgModel.MembershipTypeId = selectedMembershipId;
 
         var createResponse = await Http.PostAsJsonAsync<OrganizationCreate>("api/organization/signup", orgModel);
 

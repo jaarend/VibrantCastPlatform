@@ -1,4 +1,4 @@
-﻿@page "/organization/add-members/"
+﻿@page "/{orgName}/add-members/"
 @using global::Shared.Models.Organization;
 @using global::Shared.Models.UserAccountInfo;
 @using Microsoft.AspNetCore.Authorization;
@@ -8,9 +8,11 @@
 @inject NavigationManager navigation
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
-<PageTitle>Create Org Profile</PageTitle>
+<PageTitle>Add Members</PageTitle>
 
-<h1>Create Org Profile</h1>
+<h1>Add members to your Organization</h1>
+
+<a href="/@orgName/manage-members/">Go back to manage members</a>
 
 @if (errorMessage != null)
 {
@@ -44,6 +46,9 @@
 
 @code {
 
+    [Parameter]
+    public string orgName { get; set; }
+    public OrgInfoDetail OrgInfoDetail { get; set; } = new OrgInfoDetail();
 
     private readonly OrgUserMappingCreate orgUserMapping = new();
 
@@ -71,6 +76,9 @@
             //get the mapping info
             OrgUserMappingDetail = await Http.GetFromJsonAsync<OrgUserMappingDetail>($"/api/organization/checkmapping/{userId}");
 
+            //gets details if user is admin
+            OrgInfoDetail = await Http.GetFromJsonAsync<OrgInfoDetail>($"/api/organization/dashboard/{orgName}");
+
         }
         else
         {
@@ -86,10 +94,11 @@
         _artists = _artists.Where(user => user.Id != adminUserId).ToList();
 
         //fetch list of already mapped members
-        var orgMembers = await Http.GetFromJsonAsync<List<OrgUserMappingDetail>>($"api/organization/org-mapped-users/{OrgUserMappingDetail.OrganizationId}");
-        
+        var orgMembers = await
+        Http.GetFromJsonAsync<List<OrgUserMappingDetail>>($"api/organization/org-mapped-users/{OrgUserMappingDetail.OrganizationId}");
+
         //remove already listed members
-         _artists = _artists.Where(user => !orgMembers.Any(member => member.UserId == user.Id)).ToList();
+        _artists = _artists.Where(user => !orgMembers.Any(member => member.UserId == user.Id)).ToList();
         isLoading = false;
 
     }
@@ -113,7 +122,7 @@
 
                 if (createResponse.IsSuccessStatusCode)
                 {
-                    navigation.NavigateTo($"/organization/manage-members/");
+                    navigation.NavigateTo($"/{@orgName}/manage-members/");
                 }
                 else
                 {

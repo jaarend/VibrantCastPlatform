@@ -91,6 +91,43 @@ namespace Server.Services.UserAccountInfo
             return detail;
         }
 
+        //get artist by artist name
+        public async Task<UserAccountInfoDetail> GetUserAccountInfoByArtistNameAsync(string artistName)
+        {
+            var userAccountInfoEntity = await _dbContext
+                .UserAccountInfo
+                .FirstOrDefaultAsync(n => EF.Functions.Collate(n.ArtistName, "SQL_Latin1_General_CP1_CI_AS") == artistName);
+
+            if (userAccountInfoEntity is null)
+                return null;
+
+            var detail = new UserAccountInfoDetail
+            {
+                Id = userAccountInfoEntity.Id,
+                ProfileImage = userAccountInfoEntity.ProfileImage,
+                ArtistName = userAccountInfoEntity.ArtistName,
+                FirstName = userAccountInfoEntity.FirstName,
+                LastName = userAccountInfoEntity.LastName,
+                Description = userAccountInfoEntity.Description,
+                CommissionPrice = userAccountInfoEntity.CommissionPrice,
+                Address = userAccountInfoEntity.Address,
+                City = userAccountInfoEntity.City,
+                State = userAccountInfoEntity.State,
+                Country = userAccountInfoEntity.Country,
+                PostalCode = userAccountInfoEntity.PostalCode,
+                Website = userAccountInfoEntity.Website,
+                Booking = userAccountInfoEntity.Booking,
+                Instagram = userAccountInfoEntity.Instagram,
+                Facebook = userAccountInfoEntity.Facebook,
+                TwitterX = userAccountInfoEntity.TwitterX,
+                LinkedIn = userAccountInfoEntity.LinkedIn,
+                TikTok = userAccountInfoEntity.TikTok,
+                SnapChat = userAccountInfoEntity.SnapChat,
+                WhatsApp = userAccountInfoEntity.WhatsApp
+            };
+            return detail;
+        }
+
         public async Task<IEnumerable<UserAccountInfoDetail>> GetAllPublicUsersAsync()
         {
             var publicUsers = _dbContext

@@ -1,4 +1,4 @@
-﻿@page "/organization/manage-members/"
+﻿@page "/{orgName}/manage-members/"
 @using global::Shared.Models.Organization;
 @using global::Shared.Models.UserAccountInfo;
 @using Microsoft.AspNetCore.Authorization;
@@ -22,7 +22,8 @@
     <h2 class="text-primary">@Message</h2>
 }
 
-<a href="/organization/add-members/">Add members to your organization</a>
+<a href="/@orgName/dashboard/" class="btn btn-info m-3">Go back to dashboard</a>
+<a href="/@orgName/add-members/" class="btn btn-primary m-3">Add members to your organization</a>
 <div class="container">
     <div class="card">
         <div class="card-header d-flex justify-content-between">
@@ -69,7 +70,11 @@
     private IEnumerable<OrgUserMappingDetail> _members;
 
     [Parameter]
+    public string orgName { get; set; }
     public OrgUserMappingDetail OrgUserMappingDetail { get; set; } = new OrgUserMappingDetail();
+
+    public OrgInfoDetail OrgInfoDetail { get; set; } = new OrgInfoDetail();
+
 
     private string errorMessage;
 
@@ -91,6 +96,9 @@
         if (userIdClaim != null && OrgUserMappingDetail.UserId == userId && OrgUserMappingDetail.IsAdmin == true)
         {
 
+            //gets details if user is admin
+            OrgInfoDetail = await Http.GetFromJsonAsync<OrgInfoDetail>($"/api/organization/dashboard/{orgName}");
+
             //this should get a list of userdetails that are mapped to the organization
             _members = await Http.GetFromJsonAsync<List<OrgUserMappingDetail>>($"api/organization/org-mapped-users/{OrgUserMappingDetail.OrganizationId}");
             _members = _members.Where(user => user.IsAdmin != true).ToList();
@@ -110,11 +118,11 @@
 
         if (response.IsSuccessStatusCode)
         {
-            navigation.NavigateTo($"/organization/manage-members/");
+            navigation.NavigateTo($"/{@orgName}/manage-members/");
         }
         else
         {
-            Message = "Failed to delete note.";
+            Message = "Failed to delete member.";
         }
     }
 
