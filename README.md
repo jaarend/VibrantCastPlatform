@@ -1,6 +1,43 @@
-# VibrantCast Portfolio Platform
+# VibrantCast Platform
+
+The VibrantCast Platform is a Blazor WebApp that allows artists, gallery, and other organzations to not only create and manage and artwork portfolio, but also interact with the artist community.
+
+Users have the ability to upload their own individual artwork portfolio, add details about their artwork, message other artists, and upgrade their membership. 
+
+Organizations such as galleries, artist collectives, and schools can showcase the artwork of their members.
+
+Future improvements:
+* Ability to create collections and add artwork to it
+* Add activity tracking (clicks, opens, experiences, inquiries)
+* Allow users to create and associate experience(s) to their artwork
+* Add a collaborators table to associate multiple artists with artwork
+* Add activity dashboard for artists and organizations
+
+
 
 ## API Documentation
+
+* [User](#user-controller)
+* [Artwork](#artwork-controller)
+* [Inquiry](#inquiry-controller)
+* [MediumTag](#mediumTag-controller)
+* [MembershipType](#membershipType-controller)
+* [Organization](#organization-controller)
+* [UserAccountInfo](#user-account-information-controller)
+
+
+## User Controller
+
+Users are created using built-in ASP.NET functionality.
+
+The AspNetUsers table is mapped either directly or indirectly to the following tables:
+* AspNetRoleClaims
+* AspNetRoles
+* AspNetUserClaims
+* AspNetUserLogins
+* AspNetUserRoles
+* AspNetUserTokens
+
 
 ## Artwork Controller
 
