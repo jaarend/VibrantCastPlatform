@@ -406,7 +406,37 @@ The AspNetUsers table is mapped either directly or indirectly to the following t
         * `200 OK`: List of `OrgInfoDetail` objects containing all organization profiles.
 ### Update
 
-** need to finish
+**1. Edit organization profile:**
+
+* **Method:** `PUT /profile/edit`
+* **Body:** `OrganizationInfoEdit` object
+* **Response:**
+    * `200 OK` if update successful
+    * `401 Unauthorized` if user not logged in
+    * `404 NotFound` if organization not found
+
+**2. Upgrade organization membership:**
+
+* **Method:** `PUT /membership-upgrade`
+* **Body:** `OrgMembershipUpgrade` object
+* **Response:**
+    * `200 OK` if upgrade successful
+    * `401 Unauthorized` if user not logged in
+    * `404 NotFound` if organization not found
+
+***
+
+### Delete
+
+**1. Delete member from organization:**
+
+* **Method:** `DELETE /delete-org-user-mapping/{userId}`
+* **Path Parameters:**
+    * `userId`: The user ID
+* **Response:**
+    * `200 OK` if deletion successful
+    * `400 BadRequest` if deletion failed
+    * `401 Unauthorized` if user not logged in
 
 
 ## User Account Information Controller
