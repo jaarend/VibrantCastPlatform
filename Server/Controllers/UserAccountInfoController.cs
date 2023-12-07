@@ -27,7 +27,6 @@ namespace Server.Controllers
             _userService = userService;
         }
 
-        //may separate this out into user services
         private string GetUserId()
         {
             string userIdClaim = User.Claims.First(i => i.Type == ClaimTypes.NameIdentifier).Value;

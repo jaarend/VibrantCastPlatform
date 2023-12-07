@@ -9,25 +9,25 @@
 
 <h1>Inquiries</h1>
 
-@if(errorMessage != null)
+@if (errorMessage != null)
 {
     <h5 class="text-danger">@errorMessage</h5>
 }
 
 <div class="container">
     <EditForm Model="@model" OnValidSubmit="@HandleSubmit">
-        <DataAnnotationsValidator/>
-        <ValidationSummary/>
+        <DataAnnotationsValidator />
+        <ValidationSummary />
 
         <div class="form-group">
             <label>Send Message To:</label>
-            <InputText class="form-control" @bind-Value="model.ToUserId"/>
+            <InputText class="form-control" @bind-Value="model.ToUserId" />
             <label>Artwork</label>
-            <InputNumber class="form-control" @bind-Value="model.ArtworkId"/>
+            <InputNumber class="form-control" @bind-Value="model.ArtworkId" />
             <label>Subject</label>
-            <InputText class="form-control" @bind-Value="model.Title"/>
+            <InputText class="form-control" @bind-Value="model.Title" />
             <label>Description</label>
-            <InputText class="form-control" @bind-Value="model.Description"/>
+            <InputText class="form-control" @bind-Value="model.Description" />
         </div>
         <button type="submit" class="btn btn-primary btn-block mt-5"> Submit </button>
     </EditForm>
@@ -46,7 +46,7 @@
     {
         var createResponse = await Http.PostAsJsonAsync<InquiryCreate>("api/inquiry/create", model);
 
-        if(createResponse.IsSuccessStatusCode)
+        if (createResponse.IsSuccessStatusCode)
         {
             navigation.NavigateTo("/inquiries");
         }

@@ -15,7 +15,7 @@
 
 
 <div class="container px-4 px-lg-5">
-            <h1 class="font-weight-light mb-5">@OrgInfoDetail.OrganizationName</h1>
+    <h1 class="font-weight-light mb-5">@OrgInfoDetail.OrganizationName</h1>
 
     <div class="row gx-4 gx-lg-5 align-items-center my-5 bg-secondary p-5" style="--bs-bg-opacity: 0.5;">
         @if (OrgInfoDetail.ProfileImage != null)
@@ -26,7 +26,8 @@
             </div>
         }
         <div class="col-lg-5 bg-secondary p-4">
-            <h5 class="font-weight-light text-white">@OrgInfoDetail.Address @OrgInfoDetail.City, @OrgInfoDetail.State</h5>
+            <h5 class="font-weight-light text-white">@OrgInfoDetail.Address @OrgInfoDetail.City, @OrgInfoDetail.State
+            </h5>
             <h5 class="font-weight-light text-white">@OrgInfoDetail.Website</h5>
             <p class="text-white">@OrgInfoDetail.Description</p>
             <a class="btn btn-primary" href=@($"/organization/profile/edit/{@OrgInfoDetail.Id}")>Edit Profile</a>
@@ -40,7 +41,8 @@
                     <h2 class="card-title">Members</h2>
                     <p class="card-text">You have @numberOfMembers in your organization.</p>
                 </div>
-                <div class="card-footer"><a class="btn btn-primary btn-sm" href="/@orgName/manage-members/">Manage Members</a></div>
+                <div class="card-footer"><a class="btn btn-primary btn-sm" href="/@orgName/manage-members/">Manage
+                        Members</a></div>
             </div>
         </div>
     </div>
@@ -83,7 +85,8 @@
                 //gets details if user is admin
                 OrgInfoDetail = await Http.GetFromJsonAsync<OrgInfoDetail>($"/api/organization/dashboard/{orgName}");
 
-                _members = await Http.GetFromJsonAsync<List<OrgUserMappingDetail>>($"api/organization/org-mapped-users/{OrgUserMappingDetail.OrganizationId}");
+                _members = await
+                Http.GetFromJsonAsync<List<OrgUserMappingDetail>>($"api/organization/org-mapped-users/{OrgUserMappingDetail.OrganizationId}");
                 _members = _members.Where(user => user.IsAdmin != true).ToList();
 
                 numberOfMembers = _members.Count();

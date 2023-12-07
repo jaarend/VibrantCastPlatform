@@ -175,7 +175,7 @@ namespace Server.Controllers
 
             var orgEdit = await _organizationService.UpgradeMembership(model);
 
-            if(orgEdit == false) return NotFound();
+            if (orgEdit == false) return NotFound();
 
             return Ok(orgEdit);
         }

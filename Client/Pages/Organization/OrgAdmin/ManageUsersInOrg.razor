@@ -17,7 +17,7 @@
     <h5 class="text-danger">@errorMessage</h5>
 }
 
-@if(Message != null)
+@if (Message != null)
 {
     <h2 class="text-primary">@Message</h2>
 }
@@ -45,7 +45,8 @@
                         <tr>
                             <td>@member.UserId</td>
                             <td>@member?.IsAdmin</td>
-                            <td><button type="submit" class="btn btn-danger btn-block mt-5" disabled="@isLoading" @onclick="(() => DeleteUserFromOrg(member.UserId))"> Delete </button></td>
+                            <td><button type="submit" class="btn btn-danger btn-block mt-5" disabled="@isLoading"
+                                    @onclick="(() => DeleteUserFromOrg(member.UserId))"> Delete </button></td>
                         </tr>
                     }
                 </tbody>
@@ -80,7 +81,7 @@
 
     private bool isLoading = true;
 
-    public string Message {get; set;}
+    public string Message { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -100,7 +101,8 @@
             OrgInfoDetail = await Http.GetFromJsonAsync<OrgInfoDetail>($"/api/organization/dashboard/{orgName}");
 
             //this should get a list of userdetails that are mapped to the organization
-            _members = await Http.GetFromJsonAsync<List<OrgUserMappingDetail>>($"api/organization/org-mapped-users/{OrgUserMappingDetail.OrganizationId}");
+            _members = await
+            Http.GetFromJsonAsync<List<OrgUserMappingDetail>>($"api/organization/org-mapped-users/{OrgUserMappingDetail.OrganizationId}");
             _members = _members.Where(user => user.IsAdmin != true).ToList();
 
 

@@ -9,29 +9,29 @@
 
 <h1>Membership Types</h1>
 
-@if(errorMessage != null)
+@if (errorMessage != null)
 {
     <h5 class="text-danger">@errorMessage</h5>
 }
 
 <div class="container">
     <EditForm Model="@model" OnValidSubmit="@HandleSubmit">
-        <DataAnnotationsValidator/>
-        <ValidationSummary/>
+        <DataAnnotationsValidator />
+        <ValidationSummary />
 
         <div class="form-group">
             <label>Name</label>
-            <InputText class="form-control" @bind-Value="model.Name"/>
+            <InputText class="form-control" @bind-Value="model.Name" />
             <label>Description</label>
-            <InputText class="form-control" @bind-Value="model.Description"/>
+            <InputText class="form-control" @bind-Value="model.Description" />
             <label>Monthly Price</label>
-            <InputNumber class="form-control" @bind-Value="model.MonthlyAmount"/>
+            <InputNumber class="form-control" @bind-Value="model.MonthlyAmount" />
             <label>Yearly Price</label>
-            <InputNumber class="form-control" @bind-Value="model.YearlyAmount"/>
+            <InputNumber class="form-control" @bind-Value="model.YearlyAmount" />
             <label>Artwork Limit</label>
-            <InputNumber class="form-control" @bind-Value="model.ArtworkLimit"/>
+            <InputNumber class="form-control" @bind-Value="model.ArtworkLimit" />
             <label>Experiences Limit</label>
-            <InputNumber class="form-control" @bind-Value="model.ExperiencesLimit"/>
+            <InputNumber class="form-control" @bind-Value="model.ExperiencesLimit" />
         </div>
         <button type="submit" class="btn btn-primary btn-block mt-5"> Submit </button>
     </EditForm>
@@ -52,7 +52,7 @@
 
         var createResponse = await Http.PostAsJsonAsync<MembershipTypeCreate>("api/membershiptype/create", model);
 
-        if(createResponse.IsSuccessStatusCode)
+        if (createResponse.IsSuccessStatusCode)
         {
             navigation.NavigateTo("/memberships");
         }

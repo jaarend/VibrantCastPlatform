@@ -54,7 +54,7 @@ namespace Server.Controllers
         {
             var tag = await _mediumTagService.GetMediumTagEditByIdAsync(id);
 
-            if(tag == null) return NotFound();
+            if (tag == null) return NotFound();
 
             return Ok(tag);
         }
@@ -63,7 +63,7 @@ namespace Server.Controllers
         //UPDATE
 
         [HttpPut("edit/{id}")]
-        public async Task<IActionResult> EditMediumTag( MediumTagEdit model, int id)
+        public async Task<IActionResult> EditMediumTag(MediumTagEdit model, int id)
         {
             if (model == null || !ModelState.IsValid) return BadRequest();
 

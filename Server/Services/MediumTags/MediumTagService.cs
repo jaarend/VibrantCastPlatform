@@ -17,8 +17,6 @@ namespace Server.Services.MediumTags
             _dbContext = dbContext;
         }
 
-        //add admin only check?
-
         //CREATE
 
         public async Task<bool> CreateMediumTagAsync(MediumTagCreate model)

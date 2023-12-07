@@ -74,7 +74,7 @@ namespace Server.Controllers
 
             bool wasSuccessful = await _artworkService.AddMediumTagToArtwork(model);
 
-            if(wasSuccessful) return Ok();
+            if (wasSuccessful) return Ok();
             else return UnprocessableEntity();
         }
 
@@ -98,7 +98,7 @@ namespace Server.Controllers
 
             return artworks.ToList();
         }
-        
+
         [AllowAnonymous]
         [HttpGet("public")]
         public async Task<List<ArtworkDetail>> PublicArtwork()
@@ -114,8 +114,8 @@ namespace Server.Controllers
             if (!SetUserIdInService()) return Unauthorized();
 
             var artwork = await _artworkService.GetArtworkDetailByIdAsync(id);
-            
-            if(artwork == null) return NotFound();
+
+            if (artwork == null) return NotFound();
 
             return Ok(artwork);
         }
@@ -123,8 +123,8 @@ namespace Server.Controllers
         public async Task<IActionResult> ArtworkPublic(int id)
         {
             var artwork = await _artworkService.GetArtworkDetailByIdAsync(id);
-            
-            if(artwork == null) return NotFound();
+
+            if (artwork == null) return NotFound();
 
             return Ok(artwork);
         }
@@ -160,18 +160,15 @@ namespace Server.Controllers
 
             if (!SetUserIdInService()) return Unauthorized();
 
-            if(model.Id != id) return BadRequest();
+            if (model.Id != id) return BadRequest();
 
             bool wasSuccessful = await _artworkService.UpdateArtwork(model);
 
-            if(wasSuccessful) return Ok();
+            if (wasSuccessful) return Ok();
 
             return BadRequest();
 
         }
-
-        //just need the create medium and delete...
-
 
         //DELETE
 
@@ -182,11 +179,11 @@ namespace Server.Controllers
 
             var artwork = await _artworkService.GetArtworkDetailByIdAsync(id);
 
-            if(artwork == null) return NotFound();
+            if (artwork == null) return NotFound();
 
             bool wasSuccessful = await _artworkService.DeleteArtworkAsync(id);
 
-            if(!wasSuccessful) return BadRequest();
+            if (!wasSuccessful) return BadRequest();
 
             return Ok();
         }

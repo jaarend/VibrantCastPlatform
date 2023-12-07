@@ -28,7 +28,7 @@
                     <label>Name</label>
                     <InputText class="form-control" @bind-Value="model.Name" />
                     <label>Description</label>
-                    <textarea class="form-control" @bind="model.Description" id = "descriptionTextArea" rows = "5"></textarea>
+                    <textarea class="form-control" @bind="model.Description" id="descriptionTextArea" rows="5"></textarea>
                     <label>Date Modified (mm/dd/yy if not modified)</label>
                     <InputDate class="form-control" @bind-Value="model.DateModified" />
                 }
@@ -65,7 +65,7 @@ else
     }
 
 
-        private async void HandleSubmit()
+    private async void HandleSubmit()
     {
         model.DateModified = DateTime.Now;
 

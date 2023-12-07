@@ -9,15 +9,15 @@
 
 <h1>Update Account Information</h1>
 
-@if(errorMessage != null)
+@if (errorMessage != null)
 {
     <h5 class="text-danger">@errorMessage</h5>
 }
 
 <div class="container">
     <EditForm Model="@model" OnValidSubmit="@HandleSubmit">
-        <DataAnnotationsValidator/>
-        <ValidationSummary/>
+        <DataAnnotationsValidator />
+        <ValidationSummary />
 
         <div class="form-group">
             <label>Artist Name</label>
@@ -69,7 +69,7 @@
 
 @code {
 
-    private readonly UserAccountInfoEdit model = new();
+    private UserAccountInfoEdit model;
 
     private string errorMessage;
 
@@ -77,7 +77,7 @@
     {
         var createResponse = await Http.PutAsJsonAsync<UserAccountInfoEdit>("api/profile/accountinfo", model);
 
-        if(createResponse.IsSuccessStatusCode)
+        if (createResponse.IsSuccessStatusCode)
         {
             navigation.NavigateTo("/profile");
         }

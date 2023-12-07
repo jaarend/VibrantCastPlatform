@@ -93,9 +93,9 @@ else
         var user = authState.User;
 
         userRoles = user.Claims
-            .Where(c => c.Type == System.Security.Claims.ClaimTypes.Role)
-            .Select(c => c.Value)
-            .ToArray();
+        .Where(c => c.Type == System.Security.Claims.ClaimTypes.Role)
+        .Select(c => c.Value)
+        .ToArray();
 
 
         Debug.WriteLine($"User Roles: {string.Join(", ", userRoles)}");

@@ -124,7 +124,7 @@
     {
         tags = await Http.GetFromJsonAsync<IEnumerable<MediumTagListName>>($"api/mediumtag/names");
     }
-    
+
     public async Task OnChooseFile(InputFileChangeEventArgs e)
     {
         var file = e.File;
@@ -152,21 +152,11 @@
     private async Task CreateArtwork()
     {
 
-        //get artwork Id and medium Id to pass into AddMediumTagToArtwork
-
-        //remember to add it to the controller
-
         var response = await Http.PostAsJsonAsync<ArtworkCreate>("api/artwork/create", model);
 
         if (response.IsSuccessStatusCode)
         {
-            @* var mediumTagModel = new ArtworkMediumTagMapping
-{
-ArtworksId = Id,
-MediumTagsId = SelectedMediumTagId
-};
 
-var result = await Http.PostAsJsonAsync<ArtworkMediumTagMapping>("api/artwork/create-mediumtag", mediumTagModel); *@
             navigation.NavigateTo("/artwork");
         }
         else

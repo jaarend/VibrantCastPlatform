@@ -59,7 +59,7 @@ namespace Server.Controllers
         [HttpGet("sent")]
         public async Task<List<InquiryDetail>> Sent()
         {
-            if(!SetUserIdInService()) return new List<InquiryDetail>();
+            if (!SetUserIdInService()) return new List<InquiryDetail>();
 
             var inquiries = await _inquiryService.GetAllSentInquiriesAsync();
 
@@ -69,7 +69,7 @@ namespace Server.Controllers
         [HttpGet]
         public async Task<List<InquiryDetail>> Index()
         {
-            if(!SetUserIdInService()) return new List<InquiryDetail>();
+            if (!SetUserIdInService()) return new List<InquiryDetail>();
 
             var inquiries = await _inquiryService.GetAllReceivedInquiriesAsync();
 
@@ -80,11 +80,11 @@ namespace Server.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> Inquiry(int id)
         {
-            if(!SetUserIdInService()) return Unauthorized();
+            if (!SetUserIdInService()) return Unauthorized();
 
             var inquiry = await _inquiryService.GetInquiryByIdAsync(id);
 
-            if(inquiry == null) return NotFound();
+            if (inquiry == null) return NotFound();
 
             return Ok(inquiry);
         }

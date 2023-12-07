@@ -106,7 +106,7 @@
 
         var userId = userIdClaim.Value;
         OrgUserMappingDetail = await Http.GetFromJsonAsync<OrgUserMappingDetail>($"/api/organization/checkmapping/{userId}");
-        
+
         //check if authorized and admin
         if (userIdClaim != null && OrgUserMappingDetail.UserId == userId && OrgUserMappingDetail.IsAdmin == true)
         {
