@@ -4,7 +4,7 @@ The VibrantCast Platform is a Blazor WebApp that allows artists, gallery, and ot
 
 Users have the ability to upload their own individual artwork portfolio, add details about their artwork, message other artists, and upgrade their membership. 
 
-Organizations such as galleries, artistt collectives, and schools can showcase the artwork of their members.
+Organizations such as galleries, artist collectives, and schools can showcase the artwork of their members.
 
 Future improvements:
 * Ability to create collections and add artwork to it
