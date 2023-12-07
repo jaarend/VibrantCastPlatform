@@ -7,7 +7,6 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
 <div class="container">
-    <!-- Hero Section -->
     <div class="jumbotron text-center">
         <h1 class="display-4">Welcome to VibrantCast</h1>
         <p class="lead">Explore and discover the latest artworks.</p>
@@ -43,8 +42,14 @@
     }
     else
     {
-        <div class="row m-3 text-center">
-            <h2>Galleries and Organizations</h2>
+        <div class="row m-5 text-center">
+            <div class="jumbotron text-center">
+                <h1 class="display-4">Galleries and Organizations</h1>
+                <p class="lead">Start your own!</p>
+                <hr class="my-4">
+                <a class="btn btn-primary btn-lg" href="/explore" role="button">Join Now</a>
+            </div>
+
             @foreach (var orgs in _orgDetails)
             {
                 <div class="card col-md-8 mx-auto m-3" style="width: 18rem;">
